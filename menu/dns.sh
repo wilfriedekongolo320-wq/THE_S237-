@@ -1,3 +1,10 @@
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
+menu() {
+  exec bash "$SCRIPT_DIR/menu.sh"
+}
+
 export LN='[34m'
 export BG='[44m'
 export NC='[0m'
@@ -26,22 +33,17 @@ fi
 }
 dns_menu() {
 clear
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} ${BG}                   DNS PANEL                    ${NC} ${LN}┃${NC}"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
+menu_header "DNS PANEL" "Choisissez un fournisseur DNS"
+echo -e "${MENU_CYAN}╭──────────────────────────────────────────────────╮${MENU_NC}"
 show_current_dns
-echo -e "${LN}┃${NC} [01] • Google DNS           [04] • Quad9 DNS"
-echo -e "${LN}┃${NC} [02] • Cloudflare DNS       [05] • AdGuard Default"
-echo -e "${LN}┃${NC} [03] • OpenDNS              [06] • AdGuard Family"
-echo -e "${LN}┃${NC}"
-echo -e "${LN}┃${NC} [99] • Custom DNS"
-echo -e "${LN}┃${NC}"
-echo -e "${LN}┃${NC} [00] • Back to Main Menu"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●${NC}"
+echo -e "${MENU_CYAN}│${NC} ${MENU_GREEN}[01]${NC} Google DNS      ${MENU_GREEN}[04]${NC} Quad9 DNS"
+echo -e "${MENU_CYAN}│${NC} ${MENU_GREEN}[02]${NC} Cloudflare DNS  ${MENU_GREEN}[05]${NC} AdGuard Default"
+echo -e "${MENU_CYAN}│${NC} ${MENU_GREEN}[03]${NC} OpenDNS         ${MENU_GREEN}[06]${NC} AdGuard Family"
+echo -e "${MENU_CYAN}│${NC} ${MENU_YELLOW}[99]${NC} DNS personnalisé"
+echo -e "${MENU_CYAN}│${NC} ${MENU_RED}[00]${NC} Retour au menu principal"
+echo -e "${MENU_CYAN}╰──────────────────────────────────────────────────╯${MENU_NC}"
 echo ""
-read -rp " Select DNS Provider : " opt
+read -rp " Choix : " opt
 case $opt in
 1 |01) dns1="8.8.8.8"; dns2="8.8.4.4"; provider="Google DNS" ;;
 2 |02) dns1="1.1.1.1"; dns2="1.0.0.1"; provider="Cloudflare DNS" ;;
@@ -64,20 +66,15 @@ dns_menu
 esac
 apply_dns
 clear
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} ${BG}                   DNS PANEL                    ${NC} ${LN}┃${NC}"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} DNS has been set successfully!"
-echo -e "${LN}┃${NC} Provider     : ${provider}"
-echo -e "${LN}┃${NC} Primary DNS  : ${dns1}"
-echo -e "${LN}┃${NC} Secondary DNS: ${dns2}"
-echo -e "${LN}┃${NC}"
-echo -e "${LN}┃${NC} AutoScript Xray by 🜲 DOTYWRT V1.0"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●${NC}"
+menu_header "DNS PANEL" "Configuration appliquée"
+echo -e "${MENU_CYAN}╭──────────────────────────────────────────────────╮${MENU_NC}"
+echo -e "${MENU_CYAN}│${NC} ${MENU_GREEN}DNS configuré avec succès${MENU_NC}"
+echo -e "${MENU_CYAN}│${NC} Fournisseur : ${provider}"
+echo -e "${MENU_CYAN}│${NC} Primaire    : ${dns1}"
+echo -e "${MENU_CYAN}│${NC} Secondaire  : ${dns2}"
+echo -e "${MENU_CYAN}╰──────────────────────────────────────────────────╯${MENU_NC}"
 echo ""
-read -n 1 -s -r -p " Press any key to return to the menu..."
+menu_pause
 dns_menu
 }
 dns_menu

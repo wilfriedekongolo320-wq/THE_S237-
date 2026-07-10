@@ -1,3 +1,10 @@
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
+menu() {
+  exec bash "$SCRIPT_DIR/menu.sh"
+}
+
 LN='[34m'
 BG='[44m'
 NC='[0m'

@@ -15,14 +15,21 @@ logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s %(me
 logger = logging.getLogger('katashie-whatsapp')
 
 CONFIG_PATH = os.environ.get('KATASHIE_WA_CONFIG', '/etc/katashie_whatsapp_bot/config.json')
-with open(CONFIG_PATH) as f:
-    cfg = json.load(f)
+DEFAULT_CFG = {'twilio_account_sid': '', 'twilio_auth_token': '', 'twilio_whatsapp_number': '', 'admin_whatsapp_number': '', 'bot_password': 'katashie2024'}
+if os.path.exists(CONFIG_PATH):
+    with open(CONFIG_PATH) as f:
+        cfg = {**DEFAULT_CFG, **json.load(f)}
+else:
+    cfg = DEFAULT_CFG
 
-TWILIO_SID    = cfg['twilio_account_sid']
-TWILIO_TOKEN  = cfg['twilio_auth_token']
-TWILIO_NUMBER = cfg['twilio_whatsapp_number']
-ADMIN_NUMBER  = cfg['admin_whatsapp_number']
+TWILIO_SID    = cfg.get('twilio_account_sid', '')
+TWILIO_TOKEN  = cfg.get('twilio_auth_token', '')
+TWILIO_NUMBER = cfg.get('twilio_whatsapp_number', '')
+ADMIN_NUMBER  = cfg.get('admin_whatsapp_number', '')
 BOT_PASSWORD  = cfg.get('bot_password', 'katashie2024')
+
+if not TWILIO_SID or not TWILIO_TOKEN:
+    raise SystemExit('Missing Twilio credentials. Set KATASHIE_WA_CONFIG or /etc/katashie_whatsapp_bot/config.json')
 
 twilio_client = TwilioClient(TWILIO_SID, TWILIO_TOKEN)
 app = Flask(__name__)

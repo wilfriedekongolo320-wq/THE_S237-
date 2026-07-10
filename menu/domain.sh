@@ -1,3 +1,10 @@
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
+menu() {
+  exec bash "$SCRIPT_DIR/menu.sh"
+}
+
 clear
 export LN='[34m'
 export BG='[44m'
@@ -8,10 +15,8 @@ export DOMAIN=$(cat /etc/xray/domain)
 export MYIP=$(wget -qO- ipv4.icanhazip.com)
 function add_domain() {
 clear
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} ${BG}                 DOMAIN PANEL                   ${NC} ${LN}┃${NC}"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
+menu_header "DOMAIN PANEL" "Ajouter ou modifier un domaine"
+echo -e "${MENU_CYAN}╭──────────────────────────────────────────────────╮${MENU_NC}"
 echo
 while true; do
 read -rp " Hostname / Domain: " host
@@ -51,22 +56,14 @@ echo -e "${LN}┃${NC} Domain file not found!"
 exit 1
 fi
 clear
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} ${BG}                 DOMAIN PANEL                   ${NC} ${LN}┃${NC}"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} Domain has been set successfully!"
-echo -e "${LN}┃${NC} Current Domain: ${domain}"
-echo -e "${LN}┃${NC}                                                            "
-echo -e "${LN}┃${NC} AutoScript Xray by 🜲 DOTYWRT V1.0"
-echo -e "${LN}●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●${NC}"
-echo -e "${LN}┃${NC} [01] • Change Domain   [02] • Renew Certificate"
-echo -e "${LN}┃${NC} "
-echo -e "${LN}┃${NC} [00] • Back to Main Menu"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●${NC}"
+menu_header "DOMAIN PANEL" "Domaine enregistré"
+echo -e "${MENU_CYAN}╭──────────────────────────────────────────────────╮${MENU_NC}"
+echo -e "${MENU_CYAN}│${NC} Domaine : ${domain}"
+echo -e "${MENU_CYAN}│${NC} ${MENU_GREEN}[01]${NC} Changer de domaine   ${MENU_GREEN}[02]${NC} Renouveler le certificat"
+echo -e "${MENU_CYAN}│${NC} ${MENU_RED}[00]${NC} Retour au menu principal"
+echo -e "${MENU_CYAN}╰──────────────────────────────────────────────────╯${MENU_NC}"
 echo ""
-read -p "  Select an option : " opt
+read -p "  Choix : " opt
 echo ""
 case $opt in
 1 | 01) clear ; add_domain ;;

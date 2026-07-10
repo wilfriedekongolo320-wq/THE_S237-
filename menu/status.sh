@@ -72,38 +72,41 @@ echo ""
 read -n 1 -s -r -p " Press any key to return..."
 status
 }
+#!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
+menu() {
+  exec bash "$SCRIPT_DIR/menu.sh"
+}
+status() {
+  exec bash "$SCRIPT_DIR/status.sh"
+}
+
 clear
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} ${BG}               SERVICE INFORMATION              ${NC} ${LN}┃${NC}"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} Nginx                      : $(cek_service_init nginx)"
-echo -e "${LN}┃${NC} SSH / TUN                  : $(cek_service_init ssh)"
-echo -e "${LN}┃${NC} OpenVPN                    : $(cek_openvpn)"
-echo -e "${LN}┃${NC} OHP                        : $(cek_service ohp.service)"
-echo -e "${LN}┃${NC} Squid Proxy                : $(cek_service_init squid)"
-echo -e "${LN}┃${NC} Dropbear                   : $(cek_service_init dropbear)"
-echo -e "${LN}┃${NC} Stunnel5                   : $(cek_service stunnel5)"
-echo -e "${LN}┃${NC} Fail2Ban                   : $(cek_service_init fail2ban)"
-echo -e "${LN}┃${NC} Crons                      : $(cek_service_init cron)"
-echo -e "${LN}┃${NC} Vnstat                     : $(cek_service_init vnstat)"
-echo -e "${LN}┃${NC} XRAYS                      : $(cek_service xray)"
-echo -e "${LN}┃${NC} ZIVPN                      : $(cek_service zivpn)"
-echo -e "${LN}┃${NC} UDP Custom                 : $(cek_service udp-custom)"
-echo -e "${LN}┃${NC} SLOW DNS                   : $(cek_service dnstt)"
-echo -e "${LN}┃${NC} WS Stunnel                 : $(cek_service ws-stunnel.service)"
-echo -e "${LN}┃${NC} WS Dropbear                : $(cek_service ws-dropbear.service)"
-echo -e "${LN}┃${NC} BadVPN UDP 7100            : $(cek_badvpn 7100)"
-echo -e "${LN}┃${NC} BadVPN UDP 7200            : $(cek_badvpn 7200)"
-echo -e "${LN}┃${NC} BadVPN UDP 7300            : $(cek_badvpn 7300)"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} [01] Restart All Services"
-echo -e "${LN}┃${NC} [00] Back to Main Menu"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●${NC}"
+menu_header "SERVICE STATUS" "État des services actifs"
+echo -e "${MENU_CYAN}╭──────────────────────────────────────────────────╮${MENU_NC}"
+echo -e "${MENU_CYAN}│${NC} Nginx                      : $(cek_service_init nginx)"
+echo -e "${MENU_CYAN}│${NC} SSH / TUN                  : $(cek_service_init ssh)"
+echo -e "${MENU_CYAN}│${NC} OpenVPN                    : $(cek_openvpn)"
+echo -e "${MENU_CYAN}│${NC} OHP                        : $(cek_service ohp.service)"
+echo -e "${MENU_CYAN}│${NC} Squid Proxy                : $(cek_service_init squid)"
+echo -e "${MENU_CYAN}│${NC} Dropbear                   : $(cek_service_init dropbear)"
+echo -e "${MENU_CYAN}│${NC} Stunnel5                   : $(cek_service stunnel5)"
+echo -e "${MENU_CYAN}│${NC} Fail2Ban                   : $(cek_service_init fail2ban)"
+echo -e "${MENU_CYAN}│${NC} XRAY                       : $(cek_service xray)"
+echo -e "${MENU_CYAN}│${NC} ZIVPN                      : $(cek_service zivpn)"
+echo -e "${MENU_CYAN}│${NC} WS Stunnel                 : $(cek_service ws-stunnel.service)"
+echo -e "${MENU_CYAN}│${NC} BadVPN UDP 7100            : $(cek_badvpn 7100)"
+echo -e "${MENU_CYAN}│${NC} BadVPN UDP 7200            : $(cek_badvpn 7200)"
+echo -e "${MENU_CYAN}│${NC} BadVPN UDP 7300            : $(cek_badvpn 7300)"
+echo -e "${MENU_CYAN}╰──────────────────────────────────────────────────╯${MENU_NC}"
+echo -e "${MENU_CYAN}╭──────────────────────────────────────────────────╮${MENU_NC}"
+echo -e "${MENU_CYAN}│${NC} ${MENU_GREEN}[01]${NC} Redémarrer tous les services"
+echo -e "${MENU_CYAN}│${NC} ${MENU_RED}[00]${NC} Retour au menu principal"
+echo -e "${MENU_CYAN}╰──────────────────────────────────────────────────╯${MENU_NC}"
 echo ""
-read -rp " Select option : " opt
+read -rp " Choix : " opt
 case $opt in
 01 | 1) restart_all_services ;;
 00 | 0) menu ;;

@@ -4,12 +4,13 @@ import jwt from 'jsonwebtoken';
 import { getDb } from '../db';
 
 // Require a proper JWT secret — generate a random one if not provided (warn in logs)
+const configuredJwtSecret = process.env.NEXUS_JWT_SECRET || process.env.KATASHIE_JWT_SECRET;
 let JWT_SECRET: string;
-if (process.env.NEXUS_JWT_SECRET && process.env.NEXUS_JWT_SECRET.length >= 32) {
-  JWT_SECRET = process.env.NEXUS_JWT_SECRET;
+if (configuredJwtSecret && configuredJwtSecret.length >= 32) {
+  JWT_SECRET = configuredJwtSecret;
 } else {
   JWT_SECRET = crypto.randomBytes(48).toString('hex');
-  console.warn('[AUTH] NEXUS_JWT_SECRET not set or too short — using ephemeral random secret. All sessions will be invalidated on restart.');
+  console.warn('[AUTH] JWT secret not set or too short — using ephemeral random secret. Sessions will be invalidated on restart.');
 }
 
 export interface AuthRequest extends Request {

@@ -12,12 +12,19 @@ logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s %(me
 logger = logging.getLogger('katashie-bot')
 
 CONFIG_PATH = os.environ.get('KATASHIE_BOT_CONFIG', '/etc/katashie_bot/config.json')
-with open(CONFIG_PATH) as f:
-    cfg = json.load(f)
+DEFAULT_CFG = {'bot_token': '', 'admin_ids': [], 'reseller_ids': []}
+if os.path.exists(CONFIG_PATH):
+    with open(CONFIG_PATH) as f:
+        cfg = {**DEFAULT_CFG, **json.load(f)}
+else:
+    cfg = DEFAULT_CFG
 
-BOT_TOKEN   = cfg['bot_token']
+BOT_TOKEN   = cfg.get('bot_token', '')
 ADMIN_IDS   = cfg.get('admin_ids', [])
 RESELLER_IDS = cfg.get('reseller_ids', [])
+
+if not BOT_TOKEN:
+    raise SystemExit('Missing Telegram bot token. Set KATASHIE_BOT_CONFIG or /etc/katashie_bot/config.json')
 
 bot = telebot.TeleBot(BOT_TOKEN, parse_mode='HTML')
 

@@ -1,4 +1,6 @@
 #!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/ui.sh"
 clear
 LN='\e[36m'
 NC='\e[0m'
@@ -6,13 +8,12 @@ BG='\e[44m'
 RD='\e[31m'
 GR='\e[32m'
 
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} ${BG}           INSTALLATION DE NEXUS BOT            ${NC} ${LN}┃${NC}"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e ""
-echo -e " Ce module va relier votre serveur à Telegram."
-echo -e " Vous deviendrez le SUPER ADMIN du système."
-echo -e ""
+menu_header "INSTALLATION BOT TELEGRAM" "Connexion au serveur Telegram"
+echo -e "${MENU_CYAN}╭──────────────────────────────────────────────────╮${MENU_NC}"
+echo -e "${MENU_CYAN}│${NC} Ce module relie votre serveur à Telegram."
+echo -e "${MENU_CYAN}│${NC} Vous deviendrez SUPER ADMIN du système."
+echo -e "${MENU_CYAN}╰──────────────────────────────────────────────────╯${MENU_NC}"
+echo ""
 
 read -p " ➔ Entrez le TOKEN du Bot (ex: 1234:ABCDef...) : " bot_token
 if [[ -z "$bot_token" ]]; then echo -e "${RD}Erreur: Le Token est obligatoire.${NC}"; sleep 2; exit; fi

@@ -4,6 +4,9 @@
 #   Remplace: menu.sh (nexus)
 # ============================================================
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
 # ─── Couleurs ────────────────────────────────────────────────
 RED='\033[0;31m'
 BLUE='\033[0;34m'
@@ -64,48 +67,52 @@ else
 fi
 
 clear
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC} ${BG_BLUE}                  KATASHIE VPN                  ${NC} ${BLUE}┃${NC}"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC}  ${WHITE}OS      :${NC} ${OS_NAME}"
-echo -e "${BLUE}┃${NC}  ${WHITE}Uptime  :${NC} ${uptime_str}"
-echo -e "${BLUE}┃${NC}  ${WHITE}IP      :${NC} ${IPV4}"
-echo -e "${BLUE}┃${NC}  ${WHITE}Domaine :${NC} ${domain}"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC}   NGINX: [${s_nginx}]    XRAY: [${s_xray}]    WS: [${s_ws}]"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
+menu_header "KATASHIE VPN" "Gestion VPN • Services • Bots"
+echo -e "${MENU_CYAN}╭──────────────────────────────────────────────────╮${NC}"
+echo -e "${MENU_CYAN}│${NC} ${MENU_WHITE}OS${MENU_NC}: ${OS_NAME}    ${MENU_WHITE}IP${MENU_NC}: ${IPV4}"
+echo -e "${MENU_CYAN}│${NC} ${MENU_WHITE}Domaine${MENU_NC}: ${domain}    ${MENU_WHITE}Uptime${MENU_NC}: ${uptime_str}"
+echo -e "${MENU_CYAN}╰──────────────────────────────────────────────────╯${MENU_NC}"
+echo -e "${MENU_CYAN}╭──────────────────────────────────────────────────╮${MENU_NC}"
+echo -e "${MENU_CYAN}│${NC} ${MENU_GREEN}NGINX${MENU_NC}: [${s_nginx}]  ${MENU_GREEN}XRAY${MENU_NC}: [${s_xray}]  ${MENU_GREEN}WS${MENU_NC}: [${s_ws}]"
+echo -e "${MENU_CYAN}╰──────────────────────────────────────────────────╯${MENU_NC}"
 
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC} ${BG_BLUE}                  PROTOCOLES VPN                ${NC} ${BLUE}┃${NC}"
-echo -e "${BLUE}┃${NC}"
-echo -e "${BLUE}┃${NC} ${GREEN}[01]${NC} • SSH/WS            ${GREEN}[04]${NC} • TROJAN"
-echo -e "${BLUE}┃${NC} ${GREEN}[02]${NC} • VMESS             ${GREEN}[05]${NC} • SOCKS"
-echo -e "${BLUE}┃${NC} ${GREEN}[03]${NC} • VLESS             ${GREEN}[06]${NC} • ZIVPN"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
+echo ""
+menu_section "PROTOCOLES VPN"
+menu_option "01" "SSH / WebSocket" "$GREEN"
+menu_option "02" "VMess" "$GREEN"
+menu_option "03" "VLESS" "$GREEN"
+menu_option "04" "Trojan" "$GREEN"
+menu_option "05" "Socks" "$GREEN"
+menu_option "06" "ZIVPN" "$GREEN"
 
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC} ${BG_BLUE}                      OUTILS                    ${NC} ${BLUE}┃${NC}"
-echo -e "${BLUE}┃${NC}"
-echo -e "${BLUE}┃${NC} ${CYAN}[07]${NC} • DNS Panel         ${CYAN}[12]${NC} • Info Ports VPN"
-echo -e "${BLUE}┃${NC} ${CYAN}[08]${NC} • Domaine Panel     ${CYAN}[13]${NC} • Nettoyer Logs"
-echo -e "${BLUE}┃${NC} ${CYAN}[09]${NC} • IPv6 Panel        ${CYAN}[14]${NC} • Bot Telegram"
-echo -e "${BLUE}┃${NC} ${CYAN}[10]${NC} • Statut VPS        ${CYAN}[16]${NC} • Fast DNS"
-echo -e "${BLUE}┃${NC} ${CYAN}[11]${NC} • NetGuard"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
+echo ""
+menu_section "OUTILS & GESTION"
+menu_option "07" "DNS Panel" "$CYAN"
+menu_option "08" "Domaine Panel" "$CYAN"
+menu_option "09" "IPv6 Panel" "$CYAN"
+menu_option "10" "Statut VPS" "$CYAN"
+menu_option "11" "NetGuard" "$CYAN"
+menu_option "12" "Ports VPN" "$CYAN"
+menu_option "13" "Nettoyer Logs" "$CYAN"
+menu_option "14" "Fast DNS" "$CYAN"
 
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC} ${BG_BLUE}                   PANNEAU WEB                  ${NC} ${BLUE}┃${NC}"
-echo -e "${BLUE}┃${NC}"
-echo -e "${BLUE}┃${NC} ${WHITE}[18]${NC} • KATASHIE VPN Web Panel"
-echo -e "${BLUE}┃${NC}"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
+echo ""
+menu_section "BOTS & PANNEAU"
+menu_option "15" "Bot Telegram" "$YELLOW"
+menu_option "16" "Bot Deploy" "$YELLOW"
+menu_option "17" "Bot WhatsApp" "$YELLOW"
+menu_option "18" "Panneau Web" "$WHITE"
 
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC} ${RED}[15]${NC} • Désinstaller      ${RED}[88]${NC} • Redémarrer VPS"
-echo -e "${BLUE}┃${NC} ${WHITE}[00]${NC} • Quitter"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
+echo ""
+menu_section "SYSTEME"
+menu_option "88" "Redémarrer VPS" "$RED"
+menu_option "99" "Mise à jour" "$RED"
+menu_option "00" "Quitter" "$WHITE"
+
+echo ""
+if [ "$UPDATE_AVAILABLE" -eq 1 ] 2>/dev/null; then
+    echo -e "${YELLOW}⚡ Mise à jour disponible v${LATEST_VERSION}${NC}"
+fi
 
 if [ "$UPDATE_AVAILABLE" -eq 1 ] 2>/dev/null; then
     echo -e "${YELLOW}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
@@ -122,25 +129,26 @@ echo ""
 read -p "  Sélectionnez une option : " opt
 echo ""
 case $opt in
-1 | 01) clear ; ssh ;;
-2 | 02) clear ; vmess ;;
-3 | 03) clear ; vless ;;
-4 | 04) clear ; trojan ;;
-5 | 05) clear ; socks ;;
-6 | 06) clear ; zivpn ;;
-7 | 07) clear ; dns ;;
-8 | 08) clear ; domain ;;
-9 | 09) clear ; iptools ;;
-10)     clear ; status ;;
-11)     clear ; netguard ;;
-12)     clear ; port ;;
-13)     clear ; log ;;
-14)     clear ; tgbot ;;
-15)     clear ; uninstall ;;
-16)     clear ; fastdns ;;
-18)     clear ; web ;;
+1 | 01) clear ; exec bash "$SCRIPT_DIR/ssh.sh" ;;
+2 | 02) clear ; exec bash "$SCRIPT_DIR/vmess.sh" ;;
+3 | 03) clear ; exec bash "$SCRIPT_DIR/vless.sh" ;;
+4 | 04) clear ; exec bash "$SCRIPT_DIR/trojan.sh" ;;
+5 | 05) clear ; exec bash "$SCRIPT_DIR/socks.sh" ;;
+6 | 06) clear ; exec bash "$SCRIPT_DIR/zivpn.sh" ;;
+7 | 07) clear ; exec bash "$SCRIPT_DIR/dns.sh" ;;
+8 | 08) clear ; exec bash "$SCRIPT_DIR/domain.sh" ;;
+9 | 09) clear ; exec bash "$SCRIPT_DIR/iptools.sh" ;;
+10)     clear ; exec bash "$SCRIPT_DIR/status.sh" ;;
+11)     clear ; exec bash "$SCRIPT_DIR/netguard.sh" ;;
+12)     clear ; exec bash "$SCRIPT_DIR/port.sh" ;;
+13)     clear ; exec bash "$SCRIPT_DIR/log.sh" ;;
+14)     clear ; exec bash "$SCRIPT_DIR/fastdns.sh" ;;
+15)     clear ; bash "$SCRIPT_DIR/../katashie_core_bot/install.sh" ;;
+16)     clear ; bash "$SCRIPT_DIR/../katashie_deploy_bot/install.sh" ;;
+17)     clear ; bash "$SCRIPT_DIR/../katashie_whatsapp_bot/install.sh" ;;
+18)     clear ; exec bash "$SCRIPT_DIR/web.sh" ;;
 88)     reboot ;;
-99)     clear ; update ;;
+99)     clear ; exec bash "$SCRIPT_DIR/update.sh" ;;
 0 | 00) exit 0 ;;
-*)      clear ; menu ;;
+*)      clear ; exec bash "$SCRIPT_DIR/menu.sh" ;;
 esac

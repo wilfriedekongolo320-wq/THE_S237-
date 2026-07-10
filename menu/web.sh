@@ -4,6 +4,16 @@
 #  Manages the Nexus Tunnel Web panel from terminal.
 # ============================================================
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
+menu() {
+  exec bash "$SCRIPT_DIR/menu.sh"
+}
+web() {
+  exec bash "$SCRIPT_DIR/web.sh"
+}
+
 LN='\e[36m'
 NC='\e[0m'
 BG='\e[44m'
@@ -14,7 +24,10 @@ YL='\e[33m'
 NEXUS_WEB_DIR="/opt/katashie-web"
 CONFIG_DIR="/etc/katashie-web"
 CONFIG_FILE="$CONFIG_DIR/config.json"
-SERVICE="nexus-web"
+SERVICE="katashie-web"
+if [ ! -f "/etc/systemd/system/$SERVICE.service" ] && [ ! -f "/lib/systemd/system/$SERVICE.service" ]; then
+  SERVICE="nexus-web"
+fi
 INSTALL_SH="$NEXUS_WEB_DIR/install.sh"
 # BUG FIX: pointait vers un dépôt tiers non lié au projet (RootNexTPro/nexTPro-ScriptAll),
 # ce qui forçait git à demander des identifiants GitHub et échouait toujours
@@ -146,6 +159,28 @@ api_call() {
   fi
 }
 
+resolve_web_installer() {
+  local base
+  base="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+  local candidates=(
+    "$base/../nexus-web/install.sh"
+    "$base/../install.sh"
+    "/usr/local/sbin/nexus-web/install.sh"
+    "/opt/katashie-web/install.sh"
+  )
+
+  local candidate
+  for candidate in "${candidates[@]}"; do
+    if [ -f "$candidate" ]; then
+      echo "$candidate"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
 # ─── MAIN MENU ────────────────────────────────────────────────────────────────
 function nexus_web_menu() {
   clear
@@ -227,17 +262,16 @@ function ntw_install() {
   echo -e "  Vous aurez besoin de définir un identifiant admin."
   echo ""
 
-  local src_dir
-  if src_dir="$(resolve_web_source_dir)"; then
-    bash "$src_dir/install.sh"
-  elif [ -f /opt/katashie-web/install.sh ]; then
-    bash /opt/katashie-web/install.sh
+  local installer
+  if installer="$(resolve_web_installer)"; then
+    bash "$installer"
   else
     echo -e "${RD}  [ERROR] Source install script not found.${NC}"
     echo -e "  Expected one of:"
     echo -e "    - /usr/local/sbin/nexus-web/install.sh"
     echo -e "    - /opt/katashie-web/install.sh"
     echo -e "    - <repo>/nexus-web/install.sh"
+    echo -e "    - <repo>/install.sh"
     echo -e "  Tip: check internet access if auto-fetch failed."
     wait_key
     nexus_web_menu

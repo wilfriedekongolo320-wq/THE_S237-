@@ -1,3 +1,10 @@
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
+menu() {
+  exec bash "$SCRIPT_DIR/menu.sh"
+}
+
 export LN='[34m'
 export BG='[44m'
 export NC='[0m'
@@ -33,19 +40,14 @@ ipv6_menu() {
 while true; do
 check_ipv6_status
 clear
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} ${BG}                   IPv6 PANEL                   ${NC} ${LN}┃${NC}"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} Current IPv6 Status : ${ipv6_status}"
-echo -e "${LN}┃${NC}"
-echo -e "${LN}┃${NC} [01] • Enable IPv6        [02] • Disable IPv6"
-echo -e "${LN}┃${NC}"
-echo -e "${LN}┃${NC} [00] • Back to Main Menu"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●${NC}"
+menu_header "IPv6 PANEL" "Gérer l'état IPv6"
+echo -e "${MENU_CYAN}╭──────────────────────────────────────────────────╮${MENU_NC}"
+echo -e "${MENU_CYAN}│${NC} État actuel : ${ipv6_status}"
+echo -e "${MENU_CYAN}│${NC} ${MENU_GREEN}[01]${NC} Activer IPv6    ${MENU_GREEN}[02]${NC} Désactiver IPv6"
+echo -e "${MENU_CYAN}│${NC} ${MENU_RED}[00]${NC} Retour au menu principal"
+echo -e "${MENU_CYAN}╰──────────────────────────────────────────────────╯${MENU_NC}"
 echo ""
-read -rp " Select Option : " opt
+read -rp " Choix : " opt
 case $opt in
 1 |01)
 set_ipv6 "on"

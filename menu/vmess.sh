@@ -1,3 +1,14 @@
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
+menu() {
+  exec bash "$SCRIPT_DIR/menu.sh"
+}
+
+vmess() {
+  vmess_menu
+}
+
 clear
 readonly LN='[34m'
 readonly BG='[44m'

@@ -11,12 +11,19 @@ logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s %(me
 logger = logging.getLogger('katashie-deploy')
 
 CONFIG_PATH = os.environ.get('KATASHIE_DEPLOY_CONFIG', '/etc/katashie_deploy_bot/config.json')
-with open(CONFIG_PATH) as f:
-    cfg = json.load(f)
+DEFAULT_CFG = {'bot_token': '', 'admin_ids': []}
+if os.path.exists(CONFIG_PATH):
+    with open(CONFIG_PATH) as f:
+        cfg = {**DEFAULT_CFG, **json.load(f)}
+else:
+    cfg = DEFAULT_CFG
 
-BOT_TOKEN  = cfg['bot_token']
+BOT_TOKEN  = cfg.get('bot_token', '')
 ADMIN_IDS  = cfg.get('admin_ids', [])
 INSTALL_URL = cfg.get('install_url', 'https://raw.githubusercontent.com/abesskamer237/KATASHIE_VPN/main/autoinstall.sh')
+
+if not BOT_TOKEN:
+    raise SystemExit('Missing Telegram bot token. Set KATASHIE_DEPLOY_CONFIG or /etc/katashie_deploy_bot/config.json')
 
 bot = telebot.TeleBot(BOT_TOKEN, parse_mode='HTML')
 

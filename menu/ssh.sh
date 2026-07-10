@@ -2,6 +2,17 @@
 # ============================================================
 #   KATASHIE VPN — Menu SSH/WS
 # ============================================================
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
+menu() {
+  exec bash "$SCRIPT_DIR/menu.sh"
+}
+
+ssh() {
+  menu_ssh
+}
+
 RED='\033[0;31m'; BLUE='\033[0;34m'; GREEN='\033[0;32m'
 YELLOW='\033[0;33m'; WHITE='\033[0;37m'; BG_BLUE='\033[44m'; NC='\033[0m'
 export LN="${BLUE}"; export BG="${BG_BLUE}"; export GR="${GREEN}"; export RD="${RED}"

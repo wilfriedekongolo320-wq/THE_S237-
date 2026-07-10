@@ -26,6 +26,7 @@ services:
       - NEXUS_ADMIN_USER=${ADMIN_USER:-admin}
       - NEXUS_ADMIN_PASS=${ADMIN_PASS:-admin123}
       - NEXUS_JWT_SECRET=${JWT_SECRET:-changeme_jwt_secret_CHANGE_ME}
+      - KATASHIE_JWT_SECRET=${JWT_SECRET:-changeme_jwt_secret_CHANGE_ME}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
       - TELEGRAM_ADMIN_CHAT=${TELEGRAM_ADMIN_CHAT:-}
       - CAMPAY_APP_USERNAME=${CAMPAY_APP_USERNAME:-}
@@ -61,7 +62,7 @@ services:
       - katashie-net
     depends_on:
       katashie-web:
-        condition: service_healthy
+        condition: service_started
 
   # ─── Bot Deploy Multi-VPS ──────────────────────────────────────
   katashie-deploy-bot:

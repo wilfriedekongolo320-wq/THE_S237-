@@ -1,9 +1,20 @@
+#!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
+menu() {
+  exec bash "$SCRIPT_DIR/menu.sh"
+}
+fastdns() {
+  exec bash "$SCRIPT_DIR/fastdns.sh"
+}
+
 clear
-export LN='[34m'
-export BG='[44m'
-export NC='[0m'
-export GR='[32m'
-export RD='[31m'
+export LN='\033[34m'
+export BG='\033[44m'
+export NC='\033[0m'
+export GR='\033[32m'
+export RD='\033[31m'
 export DOMAIN=$(cat /etc/xray/domain 2>/dev/null || echo "")
 export MYIP=$(wget -qO- ipv4.icanhazip.com 2>/dev/null || hostname -I | awk '{print $1}')
 export XRAY_CONF="/etc/xray/config.json"

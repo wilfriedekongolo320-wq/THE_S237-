@@ -63,17 +63,25 @@ sync 2>/dev/null
 echo 3 > /proc/sys/vm/drop_caches 2>/dev/null
 echo -e "${LN}┃${NC} [**] RAM caches released.."
 }
+#!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
+menu() {
+  exec bash "$SCRIPT_DIR/menu.sh"
+}
+log() {
+  exec bash "$SCRIPT_DIR/log.sh"
+}
+
 clear
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} ${BG}                   LOGS PANEL                   ${NC} ${LN}┃${NC}"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
+menu_header "LOGS PANEL" "Nettoyage du système"
 clear_logs
 clear_zombie
 free_ram
-echo -e "${LN}┃${NC} [**] All cleanup done.."
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●${NC}"
+echo -e "${MENU_CYAN}╭──────────────────────────────────────────────────╮${MENU_NC}"
+echo -e "${MENU_CYAN}│${NC} ${MENU_GREEN}Nettoyage terminé${MENU_NC}"
+echo -e "${MENU_CYAN}╰──────────────────────────────────────────────────╯${MENU_NC}"
 echo ""
-read -n 1 -s -r -p " Press any key to return to IPv6 Menu..."
+menu_pause
 menu
