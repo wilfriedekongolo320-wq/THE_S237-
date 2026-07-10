@@ -69,6 +69,10 @@ Tous les protocoles se gèrent depuis le même menu interactif (`menu`) : créer
 ```bash
 # Installation en une ligne
 wget -qO- https://raw.githubusercontent.com/abesskamer237/KATASHIE_VPN/main/autoinstall.sh | bash
+
+wget https://raw.githubusercontent.com/abesskamer237/KATASHIE_VPN/main/autoinstall.sh
+chmod +x autoinstall.sh
+./autoinstall.sh
 ```
 
 ## 🐳 Installation Docker
