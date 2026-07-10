@@ -164,32 +164,29 @@ show_tns() {
     echo -e "${BLUE}●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●${NC}"
     echo ""
     read -p "  Votre choix : " opt
-    # BUG FIX: certains terminaux web (SFTP/SSH dans le navigateur) laissent un
-    # retour chariot (\r) ou des espaces invisibles dans l'entrée, ce qui faisait échouer
-    # le "case" même pour une saisie valide (1/2) → "Choix invalide!" à tort.
-    # Nettoyage agressif : suppression \r, \n, espaces, et conversion en minuscules.
-    opt=$(echo "$opt" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr '[:upper:]' '[:lower:]')
+    # Nettoyage basique : suppression des retours chariot et trim
+    opt=$(echo "$opt" | tr -d '\r' | xargs)
     echo ""
-    # Accepter aussi "a" pour accepter et "r" pour refuser (au cas où)
     case $opt in
-    1 | 01 | a | accept)
+    1 | 01)
         log_success "Conditions acceptées. Démarrage de l'installation..."
         sleep 2
         add_domain
         ;;
-    2 | 02 | r | refuse | refuser | reject)
+    2 | 02)
         log_warn "Conditions refusées. Suppression des scripts et sortie..."
         rm -f /root/*.sh
         sleep 5
         exit 0
         ;;
     *)
-        log_error "Choix invalide! Vous avez entré: [$opt]"
-        log_info "Veuillez réessayer avec 1/01 (Accepter) ou 2/02 (Refuser)."
-        sleep 3
-        show_tns
+        log_error "Choix invalide!"
+        rm -f /root/*.sh
+        sleep 5
+        exit 0
         ;;
     esac
+
 }
 
 add_domain() {
