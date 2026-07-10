@@ -36,12 +36,18 @@ cat <<JSON > /etc/katashie_bot/config.json
 JSON
 
 echo -e "${GR}[+] Téléchargement complet du moteur NEXUS C2 (Fichiers + Modules)...${NC}"
-cd /tmp
-rm -rf repo_temp
-git clone https://github.com/RootNexTPro/nexTPro-ScriptAll.git repo_temp >/dev/null 2>&1
-# On copie TOUT le dossier (le routeur et les modules)
-cp -r repo_temp/nexus_core_bot/* /etc/katashie_bot/
-rm -rf repo_temp
+if [ -d "$SCRIPT_DIR/../katashie_core_bot" ]; then
+  cp -r "$SCRIPT_DIR/../katashie_core_bot/"* /etc/katashie_bot/ 2>/dev/null || true
+  cp -r "$SCRIPT_DIR/../katashie_core_bot/modules" /etc/katashie_bot/ 2>/dev/null || true
+else
+  cd /tmp
+  rm -rf repo_temp
+  git clone https://github.com/abesskamer237/KATASHIE_VPN.git repo_temp >/dev/null 2>&1
+  if [ -d repo_temp/katashie_core_bot ]; then
+    cp -r repo_temp/katashie_core_bot/* /etc/katashie_bot/ 2>/dev/null || true
+  fi
+  rm -rf repo_temp
+fi
 
 echo -e "${GR}[+] Configuration et alignement du Démon système...${NC}"
 # On force l'écriture d'un service parfait avec les bons chemins

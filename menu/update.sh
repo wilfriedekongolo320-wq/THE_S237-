@@ -12,20 +12,37 @@ echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━
 echo -e "\n [*] Connexion au dépôt GitHub central..."
 echo -e " [*] Déploiement des modules..."
 
-MODULES=(dns zivpn expiry domain iptools menu socks ssh status trojan vless vmess netguard port log tgbot uninstall update fastdns)
+MODULES=(dns zivpn expiry domain iptools menu socks ssh status trojan vless vmess vmess_new vlesstls netguard openvpn shadowsocks hysteria2 speedtest tuic wireguard port log tgbot uninstall update web fastdns)
 
+mkdir -p "/usr/local/sbin"
 for script in "${MODULES[@]}"; do
-    wget -q -O "/usr/local/sbin/$script" "${SERVER_HOST}/menu/${script}.sh"
-    chmod +x "/usr/local/sbin/$script"
-    echo -e "  -> Module $script [OK]"
-done
+    local_url="${SERVER_HOST}/menu/${script}.sh"
+    if wget -q -O "/usr/local/sbin/$script" "$local_url"; then
+        chmod +x "/usr/local/sbin/$script"
+        echo -e "  -> Module $script [OK]"
+    else
+        echo -e "  -> Module $script [FAIL]"
+    fi
+    sleep 0.1
+ done
+
+if wget -q -O "/usr/local/sbin/ui.sh" "${SERVER_HOST}/menu/ui.sh"; then
+    chmod +x "/usr/local/sbin/ui.sh"
+    echo -e "  -> Module ui.sh [OK]"
+else
+    echo -e "  -> Module ui.sh [FAIL]"
+fi
+
+if [ -x "/usr/local/sbin/update" ]; then
+    ln -sf "/usr/local/sbin/update" "/usr/local/bin/update" 2>/dev/null || true
+fi
 
 echo -e "\n${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
 echo -e "${LN}┃${NC} ${GR}         MISE À JOUR KATASHIE VPN WEB            ${NC}${LN}┃${NC}"
 echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
 
 NEXUS_WEB_DIR="/opt/katashie-web"
-NEXUS_REPO_URL="https://github.com/RootNexTPro/nexTPro-ScriptAll.git"
+NEXUS_REPO_URL="https://github.com/abesskamer237/KATASHIE_VPN.git"
 NTW_TMP="$(mktemp -d)"
 
 if [ -d "$NEXUS_WEB_DIR" ] && [ -f "$NEXUS_WEB_DIR/dist/server/index.js" ]; then

@@ -253,24 +253,64 @@ run_scripts() {
 
 install_menu() {
     log_step "Installation des scripts de menu..."
-    local menus=(dns zivpn expiry domain iptools menu socks ssh status trojan vless vmess netguard port log tgbot uninstall update web fastdns)
+    mkdir -p "/usr/local/sbin"
+    local menus=(dns zivpn expiry domain iptools menu socks ssh status trojan vless vmess vmess_new vlesstls netguard openvpn shadowsocks hysteria2 speedtest tuic wireguard port log tgbot uninstall update web fastdns)
+    local failed=0
+
     for script in "${menus[@]}"; do
-        wget -q -O "/usr/local/sbin/${script}" "${SERVER_HOST}/menu/${script}.sh" && \
-        chmod +x "/usr/local/sbin/${script}" && \
-        echo -ne "${GREEN}✔${NC} ${script} "
+        local url="${SERVER_HOST}/menu/${script}.sh"
+        if wget -q -O "/usr/local/sbin/${script}" "$url"; then
+            chmod +x "/usr/local/sbin/${script}"
+            echo -ne "${GREEN}✔${NC} ${script} "
+        else
+            echo -ne "${RED}✘${NC} ${script} "
+            failed=1
+        fi
     done
+
+    if wget -q -O "/usr/local/sbin/ui.sh" "${SERVER_HOST}/menu/ui.sh"; then
+        chmod +x "/usr/local/sbin/ui.sh"
+        echo -ne "${GREEN}✔${NC} ui.sh "
+    else
+        echo -ne "${RED}✘${NC} ui.sh "
+        failed=1
+    fi
+
+    if [ -x "/usr/local/sbin/menu" ]; then
+        ln -sf "/usr/local/sbin/menu" "/usr/local/bin/menu" 2>/dev/null || true
+    fi
+
     echo ""
-    log_success "Scripts de menu installés dans /usr/local/sbin/"
+    if [ "$failed" -eq 0 ]; then
+        log_success "Scripts de menu installés dans /usr/local/sbin/"
+    else
+        log_warn "Certains scripts de menu n'ont pas pu être installés. Vérifiez la connexion réseau ou le dépôt."
+    fi
 }
 
 setup_profile() {
-    cat > /root/.profile << 'PROFILE_EOF'
+    local profile_file="/root/.profile"
+    local bashrc_file="/root/.bashrc"
+
+    mkdir -p "/root"
+
+    if ! grep -q '^export PATH="/usr/local/sbin:\$PATH"' "$profile_file" 2>/dev/null; then
+        cat >> "$profile_file" << 'PROFILE_EOF'
+export PATH="/usr/local/sbin:$PATH"
 if [ -f ~/.bashrc ]; then
     . ~/.bashrc
 fi
 clear
 menu
 PROFILE_EOF
+    fi
+
+    if ! grep -q '^export PATH="/usr/local/sbin:\$PATH"' "$bashrc_file" 2>/dev/null; then
+        cat >> "$bashrc_file" << 'BASHRC_EOF'
+export PATH="/usr/local/sbin:$PATH"
+BASHRC_EOF
+    fi
+
     log_success "Profil configuré (menu auto au login)."
 }
 

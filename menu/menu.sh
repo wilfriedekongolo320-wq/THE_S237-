@@ -42,6 +42,7 @@ version_greater() {
 }
 if version_greater "$LATEST_VERSION" "$INSTALLED_VERSION"; then
     UPDATE_AVAILABLE=1
+    mkdir -p /usr/local/sbin
     wget -q -O /usr/local/sbin/update "$SERVER_HOST/menu/update.sh" 2>/dev/null && chmod +x /usr/local/sbin/update
 fi
 

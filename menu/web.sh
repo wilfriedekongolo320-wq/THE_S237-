@@ -83,6 +83,16 @@ get_web_url() {
   echo "http://$ip:$port"
 }
 
+check_web_access() {
+  local port
+  port=$(get_web_port)
+  if curl -s --connect-timeout 3 --head "http://127.0.0.1:$port" | grep -qE '^HTTP/[0-9.]+ (200|301|302|303|307|308)'; then
+    echo "${GR}ACCESSIBLE${NC}"
+  else
+    echo "${RD}INACCESSIBLE${NC}"
+  fi
+}
+
 wait_key() {
   echo ""
   read -n 1 -s -r -p "  Press any key to continue..."
@@ -198,9 +208,10 @@ function nexus_web_menu() {
   echo -e "${LN}┃${NC} ${BG}           KATASHIE VPN WEB — MENU 18           ${NC} ${LN}┃${NC}"
   echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
   echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-  echo -e "${LN}┃${NC}  Status  : ${status_str}"
-  echo -e "${LN}┃${NC}  URL     : ${GR}${url}${NC}"
-  echo -e "${LN}┃${NC}  Admin   : $(get_config_value admin_user 2>/dev/null || echo 'N/A')"
+  echo -e "${LN}┃${NC}  Status       : ${status_str}"
+  echo -e "${LN}┃${NC}  URL          : ${GR}${url}${NC}"
+  echo -e "${LN}┃${NC}  HTTP Access  : $(check_web_access)"
+  echo -e "${LN}┃${NC}  Admin        : $(get_config_value admin_user 2>/dev/null || echo 'N/A')"
   echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
   echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
 

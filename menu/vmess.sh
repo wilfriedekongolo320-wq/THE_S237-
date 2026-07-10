@@ -5,6 +5,10 @@ menu() {
   exec bash "$SCRIPT_DIR/menu.sh"
 }
 
+new_vmess() {
+  exec bash "$SCRIPT_DIR/vmess_new.sh"
+}
+
 vmess() {
   vmess_menu
 }
@@ -398,7 +402,7 @@ echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━
 echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
 echo -e "${LN}┃${NC} [01] • Create Account      [04] • List Accounts"
 echo -e "${LN}┃${NC} [02] • Extend Account      [05] • Active Users"
-echo -e "${LN}┃${NC} [03] • Delete Account"
+echo -e "${LN}┃${NC} [03] • Delete Account      [06] • VMESS NEW"
 echo -e "${LN}┃${NC} "
 echo -e "${LN}┃${NC} [00] • Back to Main Menu"
 echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
@@ -412,6 +416,7 @@ case $opt in
 3 | 03) clear ; delete_vmess ;;
 4 | 04) clear ; view_config ;;
 5 | 05) clear ; vmess_login ;;
+6 | 06) clear ; new_vmess ;;
 0 | 00) clear ; menu ;;
 *)
 echo -e "${RD} [ERROR] Invalid selection!${NC}"
