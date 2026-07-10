@@ -17,8 +17,10 @@ MODULES=(dns zivpn expiry domain iptools menu socks ssh status trojan vless vmes
 mkdir -p "/usr/local/sbin"
 for script in "${MODULES[@]}"; do
     local_url="${SERVER_HOST}/menu/${script}.sh"
-    if wget -q -O "/usr/local/sbin/$script" "$local_url"; then
-        chmod +x "/usr/local/sbin/$script"
+    target="/usr/local/sbin/${script}.sh"
+    if wget -q -O "$target" "$local_url"; then
+        chmod +x "$target"
+        ln -sf "$target" "/usr/local/sbin/${script}" 2>/dev/null || true
         echo -e "  -> Module $script [OK]"
     else
         echo -e "  -> Module $script [FAIL]"

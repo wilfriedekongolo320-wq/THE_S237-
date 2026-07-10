@@ -260,8 +260,10 @@ install_menu() {
 
     for script in "${menus[@]}"; do
         local url="${SERVER_HOST}/menu/${script}.sh"
-        if wget -q -O "/usr/local/sbin/${script}" "$url"; then
-            chmod +x "/usr/local/sbin/${script}"
+        local target="/usr/local/sbin/${script}.sh"
+        if wget -q -O "$target" "$url"; then
+            chmod +x "$target"
+            ln -sf "$target" "/usr/local/sbin/${script}" 2>/dev/null || true
             echo -ne "${GREEN}✔${NC} ${script} "
         else
             echo -ne "${RED}✘${NC} ${script} "
@@ -277,8 +279,8 @@ install_menu() {
         failed=1
     fi
 
-    if [ -x "/usr/local/sbin/menu" ]; then
-        ln -sf "/usr/local/sbin/menu" "/usr/local/bin/menu" 2>/dev/null || true
+    if [ -f "/usr/local/sbin/menu.sh" ]; then
+        ln -sf "/usr/local/sbin/menu.sh" "/usr/local/bin/menu" 2>/dev/null || true
     fi
 
     echo ""
