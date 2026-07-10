@@ -193,6 +193,21 @@ def deploy_cmd(msg):
     else:
         bot.reply_to(msg, f"VPS <b>{target}</b> inconnu. Disponibles: {', '.join(vps_registry.keys())}")
 
+@bot.message_handler(commands=['remove_vps'])
+def remove_vps_cmd(msg):
+    if not require_admin(msg): return
+    parts = msg.text.split()
+    if len(parts) < 2:
+        bot.reply_to(msg, "Usage: /remove_vps &lt;nom_vps&gt;")
+        return
+    name = parts[1]
+    if name not in vps_registry:
+        bot.reply_to(msg, f"VPS <b>{name}</b> inconnu.")
+        return
+    del vps_registry[name]
+    save_registry()
+    bot.reply_to(msg, f"🗑 VPS <b>{name}</b> supprimé.")
+
 @bot.message_handler(commands=['test_vps'])
 def test_vps_cmd(msg):
     if not require_admin(msg): return

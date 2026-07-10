@@ -1,37 +1,37 @@
 #!/bin/bash
 # ============================================================
-#   KATASHIE VPN — Menu Principal
-#   Remplace: menu.sh (nexus)
+#   KATASHIE VPN — Menu Principal (v3 "NEON HACK")
+#   Style: hacking / terminal néon, multi-couleurs
 # ============================================================
 
-# ─── Couleurs ────────────────────────────────────────────────
-RED='\033[0;31m'
-BLUE='\033[0;34m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-WHITE='\033[0;37m'
-CYAN='\033[0;36m'
+# ─── Palette néon ──────────────────────────────────────────────
+GREEN='\033[0;32m'; LGREEN='\033[1;32m'
+CYAN='\033[0;36m';  LCYAN='\033[1;36m'
+MAGENTA='\033[0;35m'; LMAGENTA='\033[1;35m'
+YELLOW='\033[1;33m'
+RED='\033[1;31m'
+WHITE='\033[1;37m'
+GREY='\033[0;90m'
 BOLD='\033[1m'
-BG_BLUE='\033[44m'
+BLINK='\033[5m'
 NC='\033[0m'
 
-# Compat héritage
-export LN="${BLUE}"
-export BG="${BG_BLUE}"
-export GR="${GREEN}"
-export RD="${RED}"
+# Compat héritage (anciens scripts)
+export LN="${CYAN}"; export BG="${MAGENTA}"; export GR="${GREEN}"; export RD="${RED}"
 
-MYIP=$(curl -sS ipv4.icanhazip.com 2>/dev/null || wget -qO- ipv4.icanhazip.com)
 readonly SERVER_HOST="https://raw.githubusercontent.com/abesskamer237/KATASHIE_VPN/main"
 clear
 
+MYIP=$(curl -sS ipv4.icanhazip.com 2>/dev/null || wget -qO- ipv4.icanhazip.com)
 domain=$(cat /etc/xray/domain 2>/dev/null || echo "N/A")
-uptime_str="$(uptime -p 2>/dev/null | cut -d ' ' -f 2-10 || echo 'N/A')"
-IPV4=$(curl -s -4 ifconfig.co 2>/dev/null || echo 'N/A')
+uptime_str="$(uptime -p 2>/dev/null | sed 's/up //' || echo 'N/A')"
+IPV4=$(curl -s -4 ifconfig.co 2>/dev/null || echo "$MYIP")
+CPU_LOAD=$(uptime | awk -F'load average:' '{print $2}' | cut -d, -f1 | xargs)
+RAM_USED=$(free -m | awk '/Mem:/ {printf "%s/%sMo", $3, $2}')
 
-# ─── Vérification de version ──────────────────────────────────
+# ─── Version / mise à jour ─────────────────────────────────────
 VERSION_FILE="/etc/katashie/version"
-INSTALLED_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || cat /etc/version 2>/dev/null || echo "2.0.0")
+INSTALLED_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || cat /etc/version 2>/dev/null || echo "3.0.0")
 LATEST_VERSION=$(curl -sS "$SERVER_HOST/version" 2>/dev/null || echo "$INSTALLED_VERSION")
 UPDATE_AVAILABLE=0
 version_greater() {
@@ -42,11 +42,11 @@ if version_greater "$LATEST_VERSION" "$INSTALLED_VERSION"; then
     wget -q -O /usr/local/sbin/update "$SERVER_HOST/menu/update.sh" 2>/dev/null && chmod +x /usr/local/sbin/update
 fi
 
-# ─── Statut des services ──────────────────────────────────────
+# ─── Statut services ────────────────────────────────────────────
 get_status() {
     local svc=$1
     if systemctl is-active "$svc" >/dev/null 2>&1; then
-        echo -e "${GREEN}●RUN${NC}"
+        echo -e "${LGREEN}●ON ${NC}"
     else
         echo -e "${RED}○OFF${NC}"
     fi
@@ -54,8 +54,11 @@ get_status() {
 s_nginx=$(get_status nginx)
 s_xray=$(get_status xray)
 s_ws=$(get_status ws-stunnel)
+s_web=$(get_status nexus-web)
+s_corebot=$(get_status katashie-core-bot)
+s_deploybot=$(get_status katashie-deploy-bot)
+s_wabot=$(get_status katashie-whatsapp-bot)
 
-# ─── Infos OS ─────────────────────────────────────────────────
 if [ -f /etc/os-release ]; then
     . /etc/os-release
     OS_NAME="$NAME $VERSION_ID"
@@ -63,64 +66,94 @@ else
     OS_NAME=$(uname -s)
 fi
 
+# ─── Petits helpers d'affichage ────────────────────────────────
+line()  { printf "${GREY}%s${NC}\n" "───────────────────────────────────────────────────────"; }
+top()   { echo -e "${MAGENTA}╔══════════════════════════════════════════════════════╗${NC}"; }
+mid()   { echo -e "${MAGENTA}╠══════════════════════════════════════════════════════╣${NC}"; }
+bot()   { echo -e "${MAGENTA}╚══════════════════════════════════════════════════════╝${NC}"; }
+row()   { printf "${MAGENTA}║${NC} %-54s ${MAGENTA}║${NC}\n" "$1"; }
+
 clear
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC} ${BG_BLUE}                  KATASHIE VPN                  ${NC} ${BLUE}┃${NC}"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC}  ${WHITE}OS      :${NC} ${OS_NAME}"
-echo -e "${BLUE}┃${NC}  ${WHITE}Uptime  :${NC} ${uptime_str}"
-echo -e "${BLUE}┃${NC}  ${WHITE}IP      :${NC} ${IPV4}"
-echo -e "${BLUE}┃${NC}  ${WHITE}Domaine :${NC} ${domain}"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC}   NGINX: [${s_nginx}]    XRAY: [${s_xray}]    WS: [${s_ws}]"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
+echo -e "${LGREEN}"
+cat << 'BANNER'
+ ██╗  ██╗ █████╗ ████████╗ █████╗ ███████╗██╗  ██╗██╗███████╗
+ ██║ ██╔╝██╔══██╗╚══██╔══╝██╔══██╗██╔════╝██║  ██║██║██╔════╝
+ █████╔╝ ███████║   ██║   ███████║███████╗███████║██║█████╗
+ ██╔═██╗ ██╔══██║   ██║   ██╔══██║╚════██║██╔══██║██║██╔══╝
+ ██║  ██╗██║  ██║   ██║   ██║  ██║███████║██║  ██║██║███████╗
+ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚══════╝
+BANNER
+echo -e "${LCYAN}          [ V P N   C O N T R O L   C E N T E R ]${NC}"
+echo -e "${NC}"
 
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC} ${BG_BLUE}                  PROTOCOLES VPN                ${NC} ${BLUE}┃${NC}"
-echo -e "${BLUE}┃${NC}"
-echo -e "${BLUE}┃${NC} ${GREEN}[01]${NC} • SSH/WS            ${GREEN}[04]${NC} • TROJAN"
-echo -e "${BLUE}┃${NC} ${GREEN}[02]${NC} • VMESS             ${GREEN}[05]${NC} • SOCKS"
-echo -e "${BLUE}┃${NC} ${GREEN}[03]${NC} • VLESS             ${GREEN}[06]${NC} • ZIVPN"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
+top
+row "$(echo -e ${WHITE}SYSTÈME${NC})"
+mid
+row "$(echo -e ${GREY}OS      ${NC}: ${CYAN}${OS_NAME}${NC})"
+row "$(echo -e ${GREY}Uptime  ${NC}: ${CYAN}${uptime_str}${NC})"
+row "$(echo -e ${GREY}CPU load${NC}: ${CYAN}${CPU_LOAD}${NC}   ${GREY}RAM${NC}: ${CYAN}${RAM_USED}${NC})"
+row "$(echo -e ${GREY}IP      ${NC}: ${YELLOW}${IPV4}${NC})"
+row "$(echo -e ${GREY}Domaine ${NC}: ${YELLOW}${domain}${NC})"
+bot
 
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC} ${BG_BLUE}                      OUTILS                    ${NC} ${BLUE}┃${NC}"
-echo -e "${BLUE}┃${NC}"
-echo -e "${BLUE}┃${NC} ${CYAN}[07]${NC} • DNS Panel         ${CYAN}[12]${NC} • Info Ports VPN"
-echo -e "${BLUE}┃${NC} ${CYAN}[08]${NC} • Domaine Panel     ${CYAN}[13]${NC} • Nettoyer Logs"
-echo -e "${BLUE}┃${NC} ${CYAN}[09]${NC} • IPv6 Panel        ${CYAN}[14]${NC} • Bot Telegram"
-echo -e "${BLUE}┃${NC} ${CYAN}[10]${NC} • Statut VPS        ${CYAN}[16]${NC} • Fast DNS"
-echo -e "${BLUE}┃${NC} ${CYAN}[11]${NC} • NetGuard"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
+top
+row "$(echo -e ${WHITE}SERVICES${NC})"
+mid
+row "$(echo -e NGINX:${s_nginx}  XRAY:${s_xray}  WS:${s_ws})"
+row "$(echo -e WEB:${s_web}  BOT-CORE:${s_corebot})"
+row "$(echo -e BOT-DEPLOY:${s_deploybot}  BOT-WA:${s_wabot})"
+bot
 
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC} ${BG_BLUE}                   PANNEAU WEB                  ${NC} ${BLUE}┃${NC}"
-echo -e "${BLUE}┃${NC}"
-echo -e "${BLUE}┃${NC} ${WHITE}[18]${NC} • KATASHIE VPN Web Panel"
-echo -e "${BLUE}┃${NC}"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
+top
+row "$(echo -e ${WHITE}PROTOCOLES VPN${NC})"
+mid
+row "$(echo -e ${LGREEN}[01]${NC} SSH / WebSocket      ${LGREEN}[07]${NC} SHADOWSOCKS)"
+row "$(echo -e ${LGREEN}[02]${NC} VMESS                ${LGREEN}[08]${NC} HYSTERIA2)"
+row "$(echo -e ${LGREEN}[03]${NC} VLESS                ${LGREEN}[09]${NC} TUIC)"
+row "$(echo -e ${LGREEN}[04]${NC} TROJAN               ${LGREEN}[10]${NC} WIREGUARD)"
+row "$(echo -e ${LGREEN}[05]${NC} SOCKS5               ${LGREEN}[11]${NC} OPENVPN)"
+row "$(echo -e ${LGREEN}[06]${NC} ZIVPN \(UDP\)         ${LGREEN}[12]${NC} VLESS+WS+TLS)"
+bot
 
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC} ${RED}[15]${NC} • Désinstaller      ${RED}[88]${NC} • Redémarrer VPS"
-echo -e "${BLUE}┃${NC} ${WHITE}[00]${NC} • Quitter"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
+top
+row "$(echo -e ${WHITE}OUTILS SERVEUR${NC})"
+mid
+row "$(echo -e ${LCYAN}[20]${NC} DNS Panel            ${LCYAN}[25]${NC} Ports VPN)"
+row "$(echo -e ${LCYAN}[21]${NC} Domaine Panel        ${LCYAN}[26]${NC} Nettoyer Logs)"
+row "$(echo -e ${LCYAN}[22]${NC} IP Tools             ${LCYAN}[27]${NC} Fast DNS)"
+row "$(echo -e ${LCYAN}[23]${NC} Statut VPS           ${LCYAN}[28]${NC} Speedtest)"
+row "$(echo -e ${LCYAN}[24]${NC} NetGuard \(sécurité\))"
+bot
+
+top
+row "$(echo -e ${WHITE}DÉPLOIEMENT${NC} ${GREY}\(panneau web \& bots\)${NC})"
+mid
+row "$(echo -e ${LMAGENTA}[30]${NC} Panneau Web KATASHIE     [${s_web}])"
+row "$(echo -e ${LMAGENTA}[31]${NC} Bot Telegram — Core      [${s_corebot}])"
+row "$(echo -e ${LMAGENTA}[32]${NC} Bot Telegram — Deploy    [${s_deploybot}])"
+row "$(echo -e ${LMAGENTA}[33]${NC} Bot WhatsApp             [${s_wabot}])"
+row "$(echo -e ${LMAGENTA}[34]${NC} Déployer TOUT \(web + 3 bots\))"
+bot
 
 if [ "$UPDATE_AVAILABLE" -eq 1 ] 2>/dev/null; then
-    echo -e "${YELLOW}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-    echo -e "${YELLOW}┃${NC} ${YELLOW}[99]${NC} • ⚡ MISE À JOUR DISPONIBLE (v${LATEST_VERSION})"
-    echo -e "${YELLOW}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
+    echo -e "${YELLOW}╔══════════════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}║${NC} ${BLINK}⚡${NC} ${YELLOW}[99] MISE À JOUR DISPONIBLE → v${LATEST_VERSION}${NC}"
+    echo -e "${YELLOW}╚══════════════════════════════════════════════════════╝${NC}"
 fi
 
-echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${BLUE}┃${NC} ${WHITE}Version    :${NC} ${INSTALLED_VERSION}"
-echo -e "${BLUE}┃${NC} ${WHITE}Script by  :${NC} KATASHIE TEAM"
-echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${BLUE}●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●${NC}"
+top
+row "$(echo -e ${RED}[15]${NC} Désinstaller             ${RED}[88]${NC} Redémarrer VPS)"
+row "$(echo -e ${WHITE}[00]${NC} Quitter)"
+bot
+
+line
+echo -e " ${GREY}Version ${NC}${LGREEN}${INSTALLED_VERSION}${NC}  ${GREY}|${NC}  ${GREY}by${NC} ${LMAGENTA}KATASHIE TEAM${NC}"
+line
 echo ""
-read -p "  Sélectionnez une option : " opt
-echo ""
+echo -ne " ${LGREEN}root@katashie${NC}:${CYAN}~${NC}\$ ${WHITE}"
+read -p "Sélectionnez une option : " opt
+echo -e "${NC}"
+
 case $opt in
 1 | 01) clear ; ssh ;;
 2 | 02) clear ; vmess ;;
@@ -128,17 +161,27 @@ case $opt in
 4 | 04) clear ; trojan ;;
 5 | 05) clear ; socks ;;
 6 | 06) clear ; zivpn ;;
-7 | 07) clear ; dns ;;
-8 | 08) clear ; domain ;;
-9 | 09) clear ; iptools ;;
-10)     clear ; status ;;
-11)     clear ; netguard ;;
-12)     clear ; port ;;
-13)     clear ; log ;;
-14)     clear ; tgbot ;;
+7 | 07) clear ; shadowsocks ;;
+8 | 08) clear ; hysteria2 ;;
+9 | 09) clear ; tuic ;;
+10)     clear ; wireguard ;;
+11)     clear ; openvpn ;;
+12)     clear ; vlesstls ;;
+20)     clear ; dns ;;
+21)     clear ; domain ;;
+22)     clear ; iptools ;;
+23)     clear ; status ;;
+24)     clear ; netguard ;;
+25)     clear ; port ;;
+26)     clear ; log ;;
+27)     clear ; fastdns ;;
+28)     clear ; speedtest ;;
+30)     clear ; web ;;
+31)     clear ; deploy corebot ;;
+32)     clear ; deploy deploybot ;;
+33)     clear ; deploy whatsapp ;;
+34)     clear ; deploy all ;;
 15)     clear ; uninstall ;;
-16)     clear ; fastdns ;;
-18)     clear ; web ;;
 88)     reboot ;;
 99)     clear ; update ;;
 0 | 00) exit 0 ;;

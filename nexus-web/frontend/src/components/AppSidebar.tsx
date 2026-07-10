@@ -28,7 +28,9 @@ export default function AppSidebar({ currentPage, onNavigate, role, username, on
       <button className="sidebar-toggle" onClick={() => setMobileOpen(o => !o)}>
         {mobileOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
-      <div className={`sidebar-overlay ${mobileOpen ? 'visible' : ''}`} onClick={() => setMobileOpen(false)} />
+      {/* BUG FIX: CSS media query targets .sidebar-overlay.open, but this rendered
+          'visible' — the dark backdrop behind the mobile menu never appeared. */}
+      <div className={`sidebar-overlay ${mobileOpen ? 'open' : ''}`} onClick={() => setMobileOpen(false)} />
       <nav className={`sidebar ${mobileOpen ? 'open' : ''}`}>
         <div className="sidebar-logo">
           <span className="logo-k">K</span>

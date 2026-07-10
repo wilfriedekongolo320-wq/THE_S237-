@@ -249,7 +249,7 @@ run_scripts() {
 
 install_menu() {
     log_step "Installation des scripts de menu..."
-    local menus=(dns zivpn expiry domain iptools menu socks ssh status trojan vless vmess netguard port log tgbot uninstall update web fastdns)
+    local menus=(dns zivpn expiry domain iptools menu socks ssh status trojan vless vlesstls vmess shadowsocks hysteria2 tuic wireguard openvpn speedtest netguard port log tgbot deploy uninstall update web fastdns)
     for script in "${menus[@]}"; do
         wget -q -O "/usr/local/sbin/${script}" "${SERVER_HOST}/menu/${script}.sh" && \
         chmod +x "/usr/local/sbin/${script}" && \

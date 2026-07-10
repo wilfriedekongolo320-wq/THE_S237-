@@ -1,8 +1,41 @@
-# 🛡 KATASHIE VPN v2.0
+<div align="center">
 
-**Auto-installeur VPN multi-protocoles pour VPS Linux**  
-Contact: [@abess237](https://t.me/abess237) | [WhatsApp](https://wa.me/237682229367)  
-Chaîne: [WhatsApp Channel](https://whatsapp.com/channel/0029Vb8J9L44Y9li0Ffkqu1J)
+# 🛡️ KATASHIE VPN
+
+### Auto-installeur VPN multi-protocoles + Panneau Web + Bots de gestion
+
+![Bash](https://img.shields.io/badge/Bash-Script-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
+![Xray](https://img.shields.io/badge/Xray--core-VLESS%20%7C%20VMESS%20%7C%20Trojan-000000?style=for-the-badge)
+![Node](https://img.shields.io/badge/Node.js-20-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-Panel-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![License](https://img.shields.io/badge/License-Privé-red?style=for-the-badge)
+
+**Panneau web complet · Bot Telegram · Bot Deploy multi-VPS · Bot WhatsApp**
+
+Contact: [@abess237](https://t.me/abess237) &nbsp;•&nbsp; [WhatsApp](https://wa.me/237682229367) &nbsp;•&nbsp; [Chaîne WhatsApp](https://whatsapp.com/channel/0029Vb8J9L44Y9li0Ffkqu1J)
+
+</div>
+
+---
+
+## 🔌 Protocoles supportés
+
+| Protocole | Transport | Statut |
+|---|---|---|
+| SSH / WebSocket | WS | ✅ |
+| VMess | WS / gRPC | ✅ |
+| **VLESS** | WS / gRPC | ✅ |
+| **VLESS+WS+TLS** (direct, port 8443) | WS + TLS | ✅ |
+| Trojan | WS / gRPC | ✅ |
+| Shadowsocks | WS / gRPC | ✅ |
+| Socks5 | — | ✅ |
+| ZIVPN (UDP) | UDP | ✅ |
+| Hysteria2 | QUIC/UDP | ✅ |
+| TUIC v5 | QUIC/UDP | ✅ |
+| WireGuard | UDP | ✅ |
+| OpenVPN | TCP/UDP | ✅ |
+
+Tous les protocoles se gèrent depuis le même menu interactif (`menu`) : créer, renouveler, lister, supprimer un compte, avec lien de connexion généré automatiquement.
 
 ---
 
@@ -78,6 +111,20 @@ KATASHIE_VPN/
 └── .env.example                # Variables d'environnement
 ```
 
+## 🧩 Ajouter/gérer un protocole précis
+
+```bash
+menu shadowsocks   # Comptes Shadowsocks (WS + gRPC)
+menu hysteria2     # Comptes Hysteria2 (installation à la volée si absente)
+menu tuic          # Comptes TUIC v5
+menu wireguard     # Ouvre le gestionnaire WireGuard (add/list/revoke)
+menu openvpn       # Ouvre le gestionnaire OpenVPN (add/list/revoke)
+menu vlesstls      # Comptes VLESS+WS+TLS (port 8443, cert du domaine)
+menu speedtest     # Test de débit du serveur
+```
+
+WireGuard et OpenVPN s'appuient sur les installeurs communautaires éprouvés [angristan/wireguard-install](https://github.com/angristan/wireguard-install) et [angristan/openvpn-install](https://github.com/angristan/openvpn-install) — leur propre menu de gestion des clients s'ouvre directement depuis `menu wireguard` / `menu openvpn`.
+
 ## 🌐 Panneau Web — Accès
 
 | URL | Description |
@@ -128,4 +175,4 @@ cp katashie_whatsapp_bot/config.example.json /etc/katashie_whatsapp_bot/config.j
 - **Chaîne WhatsApp:** [S'abonner](https://whatsapp.com/channel/0029Vb8J9L44Y9li0Ffkqu1J)
 
 ---
-© 2025 KATASHIE VPN — Tous droits réservés
+© 2025-2026 KATASHIE VPN — Tous droits réservés
