@@ -6,11 +6,11 @@ menu() {
 }
 
 clear
-export LN='[34m'
-export BG='[44m'
-export NC='[0m'
-export GR='[32m'
-export RD='[31m'
+export LN='\033[34m'
+export BG='\033[44m'
+export NC='\033[0m'
+export GR='\033[32m'
+export RD='\033[31m'
 export DOMAIN=$(cat /etc/xray/domain)
 export MYIP=$(wget -qO- ipv4.icanhazip.com)
 function add_domain() {

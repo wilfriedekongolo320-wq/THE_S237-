@@ -5,11 +5,11 @@ menu() {
   exec bash "$SCRIPT_DIR/menu.sh"
 }
 
-export LN='[34m'
-export BG='[44m'
-export NC='[0m'
-export GR='[32m'
-export RD='[31m'
+export LN='\033[34m'
+export BG='\033[44m'
+export NC='\033[0m'
+export GR='\033[32m'
+export RD='\033[31m'
 show_current_dns() {
 current_dns=$(grep "nameserver" /etc/resolv.conf | awk '{print $2}' | xargs)
 if [[ -z "$current_dns" ]]; then

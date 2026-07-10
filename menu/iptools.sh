@@ -5,12 +5,12 @@ menu() {
   exec bash "$SCRIPT_DIR/menu.sh"
 }
 
-export LN='[34m'
-export BG='[44m'
-export NC='[0m'
-export GR='[32m'
-export RD='[31m'
-export YL='[33m'
+export LN='\033[34m'
+export BG='\033[44m'
+export NC='\033[0m'
+export GR='\033[32m'
+export RD='\033[31m'
+export YL='\033[33m'
 check_ipv6_status() {
 status=$(sysctl -n net.ipv6.conf.all.disable_ipv6 2>/dev/null)
 if [[ "$status" == "0" ]]; then

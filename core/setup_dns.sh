@@ -1,9 +1,9 @@
 clear
-export LN='[34m'
-export BG='[44m'
-export NC='[0m'
-export GR='[32m'
-export RD='[31m'
+export LN='\033[34m'
+export BG='\033[44m'
+export NC='\033[0m'
+export GR='\033[32m'
+export RD='\033[31m'
 echo "Please Wait ... Installing required packages"
 REQUIRED_PACKAGES=(
 curl wget dnsutils git screen whois pwgen python jq fail2ban sudo

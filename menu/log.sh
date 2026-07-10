@@ -2,12 +2,12 @@ clear
 set -euo pipefail
 IFS=$'
 	'
-export LN='[34m'
-export BG='[44m'
-export NC='[0m'
-export GR='[32m'
-export RD='[31m'
-export YL='[33m'
+export LN='\033[34m'
+export BG='\033[44m'
+export NC='\033[0m'
+export GR='\033[32m'
+export RD='\033[31m'
+export YL='\033[33m'
 logs_to_clear=(
 "/var/log/*.log"
 "/var/log/*.err"
