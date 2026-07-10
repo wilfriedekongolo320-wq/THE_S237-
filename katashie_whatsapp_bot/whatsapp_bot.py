@@ -123,19 +123,13 @@ def process_command(phone: str, text: str) -> str:
     is_adm = phone == ADMIN_NUMBER or session.get('role') == 'admin'
     is_res = phone in RESELLER_NUMBERS or session.get('role') == 'reseller'
 
-    # BUG FIX: lowercasing the whole message broke case-sensitive passwords
-    # and usernames (e.g. "MyPass123" became "mypass123", breaking auth and
-    # creating accounts with the wrong username). Only the command keyword
-    # is matched case-insensitively; arguments keep their original case.
-    raw_text = text.strip()
-    text = raw_text.lower()
-    raw_parts = raw_text.split()
+    text = text.strip().lower()
     parts = text.split()
     cmd = parts[0] if parts else ''
 
     # Authentication
     if not is_auth:
-        if raw_text == BOT_PASSWORD or raw_text == f"connexion {BOT_PASSWORD}":
+        if text == BOT_PASSWORD or text == f"connexion {BOT_PASSWORD}":
             role = 'admin' if phone == ADMIN_NUMBER else ('reseller' if phone in RESELLER_NUMBERS else 'unknown')
             if role == 'unknown':
                 return "⛔ Numéro non autorisé. Contactez @abess237 sur Telegram."
@@ -165,18 +159,18 @@ def process_command(phone: str, text: str) -> str:
         if action in ['créer', 'creer', 'create', 'add']:
             if len(parts) < 4:
                 return "Usage: ssh créer <username> <jours>"
-            return create_ssh(raw_parts[2], raw_parts[3])
+            return create_ssh(parts[2], parts[3])
         elif action in ['lister', 'list']:
             return list_ssh()
         elif action in ['supprimer', 'delete', 'del']:
             if len(parts) < 3:
                 return "Usage: ssh supprimer <username>"
-            return delete_ssh(raw_parts[2])
+            return delete_ssh(parts[2])
         elif action in ['renouveler', 'renew']:
             if len(parts) < 4:
                 return "Usage: ssh renouveler <username> <jours>"
-            run_cmd(f"chage -E $(date -d '+{raw_parts[3]} days' '+%Y-%m-%d') {raw_parts[2]}")
-            return f"✅ Compte `{raw_parts[2]}` renouvelé de {raw_parts[3]} jours"
+            run_cmd(f"chage -E $(date -d '+{parts[3]} days' '+%Y-%m-%d') {parts[2]}")
+            return f"✅ Compte `{parts[2]}` renouvelé de {parts[3]} jours"
 
     # XRAY
     if cmd in ['vless', 'vmess', 'trojan']:
@@ -186,7 +180,7 @@ def process_command(phone: str, text: str) -> str:
         if action in ['créer', 'creer', 'create']:
             if len(parts) < 4:
                 return f"Usage: {cmd} créer <username> <jours>"
-            return create_xray(cmd, raw_parts[2], raw_parts[3])
+            return create_xray(cmd, parts[2], parts[3])
 
     if cmd == 'xray':
         if len(parts) < 2:
@@ -205,8 +199,8 @@ def process_command(phone: str, text: str) -> str:
         if action in ['créer', 'creer']:
             if len(parts) < 5:
                 return "Usage: revendeur créer <username> <password> <jours> [max_clients]"
-            u, p, d = raw_parts[2], raw_parts[3], raw_parts[4]
-            max_c = raw_parts[5] if len(raw_parts) > 5 else '50'
+            u, p, d = parts[2], parts[3], parts[4]
+            max_c = parts[5] if len(parts) > 5 else '50'
             return f"✅ *Revendeur créé*\n\n👤 User: `{u}`\n🔑 Pass: `{p}`\n📅 Durée: {d} jours\n👥 Max clients: {max_c}\n\nURL panneau: http://VOTRE_IP:2087"
         elif action in ['lister', 'list']:
             return "📋 *Revendeurs:*\nVoir panneau web → /api/resellers"

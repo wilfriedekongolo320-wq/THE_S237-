@@ -22,9 +22,12 @@ router.get('/', requireAuth, requireAdmin, (req: Request, res: Response) => {
     filters.push('action LIKE ?');
     params.push(`%${req.query.action}%`);
   }
-  if (req.query.status) {
-    filters.push('status = ?');
-    params.push(req.query.status);
+  // BUG FIX: audit_logs n'a pas de colonne "status" (voir server/db.ts) — le filtre
+  // provoquait une erreur SQL "no such column: status". La colonne réelle
+  // pour filtrer par type de cible est "target_type".
+  if (req.query.target_type) {
+    filters.push('target_type = ?');
+    params.push(req.query.target_type);
   }
 
   const where = filters.length ? `WHERE ${filters.join(' AND ')}` : '';

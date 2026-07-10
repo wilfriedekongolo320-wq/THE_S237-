@@ -164,6 +164,10 @@ show_tns() {
     echo -e "${BLUE}●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●${NC}"
     echo ""
     read -p "  Votre choix : " opt
+    # BUG FIX: certains terminaux web (SFTP/SSH dans le navigateur) laissent un
+    # retour chariot (\r) ou des espaces dans l'entrée, ce qui faisait échouer
+    # le "case" même pour une saisie valide (1/2) → "Choix invalide!" à tort.
+    opt=$(echo "$opt" | tr -d '\r' | xargs)
     echo ""
     case $opt in
     1 | 01)
@@ -249,7 +253,7 @@ run_scripts() {
 
 install_menu() {
     log_step "Installation des scripts de menu..."
-    local menus=(dns zivpn expiry domain iptools menu socks ssh status trojan vless vlesstls vmess shadowsocks hysteria2 tuic wireguard openvpn speedtest netguard port log tgbot deploy uninstall update web fastdns)
+    local menus=(dns zivpn expiry domain iptools menu socks ssh status trojan vless vmess netguard port log tgbot uninstall update web fastdns)
     for script in "${menus[@]}"; do
         wget -q -O "/usr/local/sbin/${script}" "${SERVER_HOST}/menu/${script}.sh" && \
         chmod +x "/usr/local/sbin/${script}" && \

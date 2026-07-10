@@ -16,7 +16,10 @@ CONFIG_DIR="/etc/katashie-web"
 CONFIG_FILE="$CONFIG_DIR/config.json"
 SERVICE="nexus-web"
 INSTALL_SH="$NEXUS_WEB_DIR/install.sh"
-NEXUS_REPO_URL="https://github.com/RootNexTPro/nexTPro-ScriptAll.git"
+# BUG FIX: pointait vers un dépôt tiers non lié au projet (RootNexTPro/nexTPro-ScriptAll),
+# ce qui forçait git à demander des identifiants GitHub et échouait toujours
+# ("Source install script not found"). Corrigé vers le dépôt officiel KATASHIE VPN.
+NEXUS_REPO_URL="https://github.com/abesskamer237/KATASHIE_VPN.git"
 TMP_WEB_SRC="/tmp/nexus-web-src-$$"
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -104,7 +107,9 @@ resolve_web_source_dir() {
 
   # 4) fallback: shallow clone repository in /tmp and use nexus-web folder
   rm -rf "$TMP_WEB_SRC"
-  if git clone --depth 1 "$NEXUS_REPO_URL" "$TMP_WEB_SRC" >/dev/null 2>&1; then
+  # BUG FIX: GIT_TERMINAL_PROMPT=0 empêche git de bloquer sur une invite
+  # "Username for ..." si l'URL est fausse ou le dépôt privé — échoue vite au lieu de pendre.
+  if GIT_TERMINAL_PROMPT=0 git clone --depth 1 "$NEXUS_REPO_URL" "$TMP_WEB_SRC" >/dev/null 2>&1; then
     src="$TMP_WEB_SRC/nexus-web"
     if [ -d "$src" ] && [ -f "$src/install.sh" ]; then
       echo "$src"
