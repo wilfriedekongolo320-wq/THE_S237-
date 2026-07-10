@@ -165,27 +165,29 @@ show_tns() {
     echo ""
     read -p "  Votre choix : " opt
     # BUG FIX: certains terminaux web (SFTP/SSH dans le navigateur) laissent un
-    # retour chariot (\r) ou des espaces dans l'entrée, ce qui faisait échouer
+    # retour chariot (\r) ou des espaces invisibles dans l'entrée, ce qui faisait échouer
     # le "case" même pour une saisie valide (1/2) → "Choix invalide!" à tort.
-    opt=$(echo "$opt" | tr -d '\r' | xargs)
+    # Nettoyage agressif : suppression \r, \n, espaces, et conversion en minuscules.
+    opt=$(echo "$opt" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr '[:upper:]' '[:lower:]')
     echo ""
+    # Accepter aussi "a" pour accepter et "r" pour refuser (au cas où)
     case $opt in
-    1 | 01)
+    1 | 01 | a | accept)
         log_success "Conditions acceptées. Démarrage de l'installation..."
         sleep 2
         add_domain
         ;;
-    2 | 02)
+    2 | 02 | r | refuse | refuser | reject)
         log_warn "Conditions refusées. Suppression des scripts et sortie..."
         rm -f /root/*.sh
         sleep 5
         exit 0
         ;;
     *)
-        log_error "Choix invalide!"
-        rm -f /root/*.sh
-        sleep 5
-        exit 0
+        log_error "Choix invalide! Vous avez entré: [$opt]"
+        log_info "Veuillez réessayer avec 1/01 (Accepter) ou 2/02 (Refuser)."
+        sleep 3
+        show_tns
         ;;
     esac
 }
@@ -203,6 +205,8 @@ add_domain() {
     echo ""
     while true; do
         read -rp "  Hostname / Domaine : " host
+        # Nettoyage de l'entrée : suppression des espaces et caractères invisibles
+        host=$(echo "$host" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
         if [[ -z "$host" ]]; then
             log_error "Le domaine ne peut pas être vide."
             continue
