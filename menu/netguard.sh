@@ -132,17 +132,15 @@ echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━
 echo -e "${LN}┃${NC} ${BG}                  NETGUARD MENU                 ${NC} ${LN}┃${NC}"
 echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
 echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-if systemctl is-enabled --quiet blocker.service 2>/dev/null; then
-echo -e "${LN}┃${NC} Status : ${GR}Installed${NC}"
-echo -e "${LN}┃${NC}"
-echo -e "${LN}┃${NC} [01] • Uninstall Netguard"
-else
-echo -e "${LN}┃${NC} Status : ${RD}Not Installed${NC}"
-echo -e "${LN}┃${NC}"
-echo -e "${LN}┃${NC} [01] • Install Netguard"
-fi
-echo -e "${LN}┃${NC}"
-echo -e "${LN}┃${NC} [00] • Back To Main Menu"
+		if systemctl is-enabled --quiet blocker.service 2>/dev/null; then
+			echo -e "${LN}┃${NC} Status : ${GR}Installed${NC}"
+			echo -e "${LN}┃${NC}"
+			menu_pair "01" "Uninstall Netguard" "$GR" "00" "Back To Main Menu" "$WHITE"
+		else
+			echo -e "${LN}┃${NC} Status : ${RD}Not Installed${NC}"
+			echo -e "${LN}┃${NC}"
+			menu_pair "01" "Install Netguard" "$GR" "00" "Back To Main Menu" "$WHITE"
+		fi
 echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
 echo -e "${LN}●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●${NC}"
 echo ""

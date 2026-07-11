@@ -74,7 +74,15 @@ status
 }
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/ui.sh"
+if [ -f "$SCRIPT_DIR/ui.sh" ]; then
+  source "$SCRIPT_DIR/ui.sh"
+elif [ -f "/usr/local/sbin/ui.sh" ]; then
+  SCRIPT_DIR="/usr/local/sbin"
+  source "$SCRIPT_DIR/ui.sh"
+else
+  echo "Erreur : ui.sh introuvable" >&2
+  exit 1
+fi
 
 menu() {
   exec bash "$SCRIPT_DIR/menu.sh"
@@ -102,8 +110,7 @@ echo -e "${MENU_CYAN}│${NC} BadVPN UDP 7200            : $(cek_badvpn 7200)"
 echo -e "${MENU_CYAN}│${NC} BadVPN UDP 7300            : $(cek_badvpn 7300)"
 echo -e "${MENU_CYAN}╰──────────────────────────────────────────────────╯${MENU_NC}"
 echo -e "${MENU_CYAN}╭──────────────────────────────────────────────────╮${MENU_NC}"
-echo -e "${MENU_CYAN}│${NC} ${MENU_GREEN}[01]${NC} Redémarrer tous les services"
-echo -e "${MENU_CYAN}│${NC} ${MENU_RED}[00]${NC} Retour au menu principal"
+menu_pair "01" "Redémarrer tous les services" "$GR" "00" "Retour au menu principal" "$WHITE"
 echo -e "${MENU_CYAN}╰──────────────────────────────────────────────────╯${MENU_NC}"
 echo ""
 read -rp " Choix : " opt

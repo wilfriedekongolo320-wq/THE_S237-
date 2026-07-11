@@ -3,7 +3,15 @@
 #   KATASHIE VPN — Menu SSH/WS
 # ============================================================
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/ui.sh"
+if [ -f "$SCRIPT_DIR/ui.sh" ]; then
+  source "$SCRIPT_DIR/ui.sh"
+elif [ -f "/usr/local/sbin/ui.sh" ]; then
+  SCRIPT_DIR="/usr/local/sbin"
+  source "$SCRIPT_DIR/ui.sh"
+else
+  echo "Erreur : ui.sh introuvable" >&2
+  exit 1
+fi
 
 menu() {
   exec bash "$SCRIPT_DIR/menu.sh"
@@ -200,17 +208,11 @@ function list_ssh_members() {
 
 function menu_ssh() {
   clear
-  echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-  echo -e "${BLUE}┃${NC} ${BG_BLUE}              MENU SSH — KATASHIE VPN            ${NC} ${BLUE}┃${NC}"
-  echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-  echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-  echo -e "${BLUE}┃${NC} ${GREEN}[01]${NC} • Créer un compte     ${GREEN}[04]${NC} • Lister les comptes"
-  echo -e "${BLUE}┃${NC} ${GREEN}[02]${NC} • Renouveler          ${GREEN}[05]${NC} • Utilisateurs en ligne"
-  echo -e "${BLUE}┃${NC} ${RED}[03]${NC} • Supprimer"
-  echo -e "${BLUE}┃${NC}"
-  echo -e "${BLUE}┃${NC} ${WHITE}[00]${NC} • Retour au menu principal"
-  echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-  echo -e "${BLUE}●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●${NC}"
+  menu_header "MENU SSH — KATASHIE VPN" ""
+  menu_pair "01" "Créer un compte" "$GREEN" "02" "Renouveler" "$GREEN"
+  menu_pair "03" "Supprimer" "$RED" "04" "Lister les comptes" "$GREEN"
+  echo ""
+  menu_pair "00" "Retour au menu principal" "$WHITE" "" "" ""
   echo ""
   read -p "  Sélectionnez une option : " opt
   echo ""

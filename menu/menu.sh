@@ -5,7 +5,25 @@
 # ============================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/ui.sh"
+cat << 'BANNER'
+ ██╗  ██╗ █████╗ ████████╗ █████╗ ███████╗██╗  ██╗██╗███████╗
+ ██║ ██╔╝██╔══██╗╚══██╔══╝██╔══██╗██╔════╝██║  ██║██║██╔════╝
+ █████╔╝ ███████║   ██║   ███████║███████╗███████║██║█████╗
+ ██╔═██╗ ██╔══██║   ██║   ██╔══██║╚════██║██╔══██║██║██╔══╝
+ ██║  ██╗██║  ██║   ██║   ██║  ██║███████║██║  ██║██║███████╗
+ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚══════╝
+                       KATASHIE VPN
+BANNER
+if [ -f "$SCRIPT_DIR/ui.sh" ]; then
+    source "$SCRIPT_DIR/ui.sh"
+elif [ -f "/usr/local/sbin/ui.sh" ]; then
+    SCRIPT_DIR="/usr/local/sbin"
+    source "$SCRIPT_DIR/ui.sh"
+else
+    echo "Erreur : ui.sh introuvable" >&2
+    exit 1
+fi
+SCRIPT_DIR="$(resolve_script_dir)"
 
 # ─── Couleurs ────────────────────────────────────────────────
 RED='\033[0;31m'
@@ -79,36 +97,26 @@ echo -e "${MENU_CYAN}╰──────────────────�
 
 echo ""
 menu_section "PROTOCOLES VPN"
-menu_option "01" "SSH / WebSocket" "$GREEN"
-menu_option "02" "VMess" "$GREEN"
-menu_option "03" "VLESS" "$GREEN"
-menu_option "04" "Trojan" "$GREEN"
-menu_option "05" "Socks" "$GREEN"
-menu_option "06" "ZIVPN" "$GREEN"
+menu_pair "01" "SSH / WebSocket" "$GREEN" "02" "VMess" "$GREEN"
+menu_pair "03" "VLESS" "$GREEN" "04" "Trojan" "$GREEN"
+menu_pair "05" "Socks" "$GREEN" "06" "ZIVPN" "$GREEN"
 
 echo ""
 menu_section "OUTILS & GESTION"
-menu_option "07" "DNS Panel" "$CYAN"
-menu_option "08" "Domaine Panel" "$CYAN"
-menu_option "09" "IPv6 Panel" "$CYAN"
-menu_option "10" "Statut VPS" "$CYAN"
-menu_option "11" "NetGuard" "$CYAN"
-menu_option "12" "Ports VPN" "$CYAN"
-menu_option "13" "Nettoyer Logs" "$CYAN"
-menu_option "14" "Fast DNS" "$CYAN"
+menu_pair "07" "DNS Panel" "$CYAN" "08" "Domaine Panel" "$CYAN"
+menu_pair "09" "IPv6 Panel" "$CYAN" "10" "Statut VPS" "$CYAN"
+menu_pair "11" "NetGuard" "$CYAN" "12" "Ports VPN" "$CYAN"
+menu_pair "13" "Nettoyer Logs" "$CYAN" "14" "Fast DNS" "$CYAN"
 
 echo ""
 menu_section "BOTS & PANNEAU"
-menu_option "15" "Bot Telegram" "$YELLOW"
-menu_option "16" "Bot Deploy" "$YELLOW"
-menu_option "17" "Bot WhatsApp" "$YELLOW"
-menu_option "18" "Panneau Web" "$WHITE"
+menu_pair "15" "Bot Telegram" "$YELLOW" "16" "Bot Deploy" "$YELLOW"
+menu_pair "17" "Bot WhatsApp" "$YELLOW" "18" "Panneau Web" "$WHITE"
 
 echo ""
 menu_section "SYSTEME"
-menu_option "88" "Redémarrer VPS" "$RED"
-menu_option "99" "Mise à jour" "$RED"
-menu_option "00" "Quitter" "$WHITE"
+menu_pair "88" "Redémarrer VPS" "$RED" "99" "Mise à jour" "$RED"
+menu_pair "00" "Quitter" "$WHITE" "" "" ""
 
 echo ""
 if [ "$UPDATE_AVAILABLE" -eq 1 ] 2>/dev/null; then

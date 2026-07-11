@@ -1,5 +1,25 @@
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd)"
-source "$SCRIPT_DIR/ui.sh"
+resolve_script_dir() {
+  local source="${BASH_SOURCE[0]}"
+  local dir=""
+  while [ -L "$source" ]; do
+    dir="$(cd -P "$(dirname "$source")" && pwd 2>/dev/null || pwd)"
+    source="$(readlink "$source")"
+    [[ "$source" != /* ]] && source="$dir/$source"
+  done
+  dir="$(cd -P "$(dirname "$source")" && pwd 2>/dev/null || dirname "$source")"
+  printf '%s\n' "$dir"
+}
+
+SCRIPT_DIR="$(resolve_script_dir)"
+if [ -f "$SCRIPT_DIR/ui.sh" ]; then
+  source "$SCRIPT_DIR/ui.sh"
+elif [ -f "/usr/local/sbin/ui.sh" ]; then
+  SCRIPT_DIR="/usr/local/sbin"
+  source "$SCRIPT_DIR/ui.sh"
+else
+  echo "Erreur : ui.sh introuvable" >&2
+  exit 1
+fi
 
 menu() {
   exec bash "$SCRIPT_DIR/menu.sh"
@@ -395,34 +415,25 @@ read -n 1 -s -r -p " Press any key to return to the menu..."
 vmess
 }
 function vmess_menu() {
-clear
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} ${BG}                  VMESS MENU                    ${NC} ${LN}┃${NC}"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
-echo -e "${LN}┃${NC} [01] • Create Account      [04] • List Accounts"
-echo -e "${LN}┃${NC} [02] • Extend Account      [05] • Active Users"
-echo -e "${LN}┃${NC} [03] • Delete Account      [06] • VMESS NEW"
-echo -e "${LN}┃${NC} "
-echo -e "${LN}┃${NC} [00] • Back to Main Menu"
-echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
-echo -e "${LN}●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●${NC}"
-echo ""
-read -p "  Select menu : " opt
-echo ""
-case $opt in
-1 | 01) clear ; add_vmess ;;
-2 | 02) clear ; renew_vmess ;;
-3 | 03) clear ; delete_vmess ;;
-4 | 04) clear ; view_config ;;
-5 | 05) clear ; vmess_login ;;
-6 | 06) clear ; new_vmess ;;
-0 | 00) clear ; menu ;;
-*)
-echo -e "${RD} [ERROR] Invalid selection!${NC}"
-sleep 1
-vmess_menu
-;;
-esac
+  clear
+  menu_header "VMESS MENU" ""
+  menu_pair "01" "Create Account" "$GR" "02" "Extend Account" "$GR"
+  menu_pair "03" "Delete Account" "$RD" "04" "List Accounts" "$GR"
+  menu_pair "05" "Active Users" "$GR" "06" "VMESS NEW" "$GR"
+  echo ""
+  menu_pair "00" "Back to Main Menu" "$WHITE" "" "" ""
+  echo ""
+  read -p "  Select menu : " opt
+  echo ""
+  case $opt in
+    1 | 01) clear ; add_vmess ;;
+    2 | 02) clear ; renew_vmess ;;
+    3 | 03) clear ; delete_vmess ;;
+    4 | 04) clear ; view_config ;;
+    5 | 05) clear ; vmess_login ;;
+    6 | 06) clear ; new_vmess ;;
+    0 | 00) clear ; menu ;;
+    *) echo -e "${RD} [ERROR] Invalid selection!${NC}"; sleep 1; vmess_menu ;;
+  esac
 }
 vmess_menu

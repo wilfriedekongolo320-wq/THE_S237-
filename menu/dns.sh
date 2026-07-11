@@ -1,5 +1,13 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/ui.sh"
+if [ -f "$SCRIPT_DIR/ui.sh" ]; then
+  source "$SCRIPT_DIR/ui.sh"
+elif [ -f "/usr/local/sbin/ui.sh" ]; then
+  SCRIPT_DIR="/usr/local/sbin"
+  source "$SCRIPT_DIR/ui.sh"
+else
+  echo "Erreur : ui.sh introuvable" >&2
+  exit 1
+fi
 
 menu() {
   exec bash "$SCRIPT_DIR/menu.sh"

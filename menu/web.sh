@@ -4,8 +4,28 @@
 #  Manages the Nexus Tunnel Web panel from terminal.
 # ============================================================
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/ui.sh"
+resolve_script_dir() {
+  local source="${BASH_SOURCE[0]}"
+  local dir=""
+  while [ -L "$source" ]; do
+    dir="$(cd -P "$(dirname "$source")" && pwd 2>/dev/null || pwd)"
+    source="$(readlink "$source")"
+    [[ "$source" != /* ]] && source="$dir/$source"
+  done
+  dir="$(cd -P "$(dirname "$source")" && pwd 2>/dev/null || dirname "$source")"
+  printf '%s\n' "$dir"
+}
+
+SCRIPT_DIR="$(resolve_script_dir)"
+if [ -f "$SCRIPT_DIR/ui.sh" ]; then
+  source "$SCRIPT_DIR/ui.sh"
+elif [ -f "/usr/local/sbin/ui.sh" ]; then
+  SCRIPT_DIR="/usr/local/sbin"
+  source "$SCRIPT_DIR/ui.sh"
+else
+  echo "Erreur : ui.sh introuvable" >&2
+  exit 1
+fi
 
 menu() {
   exec bash "$SCRIPT_DIR/menu.sh"
