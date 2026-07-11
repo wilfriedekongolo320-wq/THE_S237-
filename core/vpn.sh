@@ -83,15 +83,17 @@ cp /etc/openvpn/${FILE}.ovpn /home/vps/public_html/${FILE}.ovpn
 setup_ohp() {
 wget -q -O /usr/local/bin/ohp "${SERVER_HOST}/module/ohp"
 chmod +x /usr/local/bin/ohp
+# BUG FIX: Use environment variable for domain instead of hardcoded "bug.com"
+OHP_DOMAIN="${OHP_DOMAIN:-$(hostname -f)}"
 cat > /etc/openvpn/client-ohp.ovpn <<-EOF
 setenv FRIENDLY_NAME "OHP VPN NEXUS TUNNEL PRO"
 setenv CLIENT_CERT 0
 client
 dev tun
 proto tcp
-remote bug.com 443
+remote $OHP_DOMAIN 443
 http-proxy $MYIP $PORT_OHP
-http-proxy-option CUSTOM-HEADER "X-Forwarded-Host bug.com"
+http-proxy-option CUSTOM-HEADER "X-Forwarded-Host $OHP_DOMAIN"
 resolv-retry infinite
 route-method exe
 nobind

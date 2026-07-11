@@ -1,20 +1,70 @@
-import Database from 'better-sqlite3';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import fs from 'fs';
+
+// Node 22 exposes the SQLite module as a built-in experimental API.
+// Use a type-only import to avoid compile-time resolution issues on older toolchains.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { DatabaseSync } = require('node:sqlite') as { DatabaseSync: new (filePath: string) => any };
 
 // ─── BUG FIX: standardized to KATASHIE_DB_DIR (was NEXUS_DB_DIR → /etc/nexus-tunnel-web)
 // docker-compose.yml now mounts the volume to /etc/katashie-web to match this default.
 const DB_DIR  = process.env.KATASHIE_DB_DIR || process.env.NEXUS_DB_DIR || '/etc/katashie-web';
 const DB_PATH = path.join(DB_DIR, 'katashie.db');
 
-let db: Database.Database;
+type StatementLike = {
+  get(...params: unknown[]): unknown;
+  all(...params: unknown[]): unknown[];
+  run(...params: unknown[]): { changes: number; lastInsertRowid: number | bigint };
+};
 
-export function getDb(): Database.Database {
+type DbLike = {
+  prepare(query: string): StatementLike;
+  exec(query: string): void;
+  pragma(command: string): void;
+  close(): void;
+};
+
+class SqliteCompatDatabase implements DbLike {
+  private readonly connection: any;
+
+  constructor(filePath: string) {
+    this.connection = new DatabaseSync(filePath);
+  }
+
+  prepare(query: string): StatementLike {
+    return this.connection.prepare(query) as unknown as StatementLike;
+  }
+
+  exec(query: string): void {
+    this.connection.exec(query);
+  }
+
+  pragma(command: string): void {
+    const normalized = command.trim().toLowerCase();
+    const mapped = {
+      'journal_mode = wal': 'PRAGMA journal_mode=WAL',
+      'foreign_keys = on': 'PRAGMA foreign_keys=ON',
+      'busy_timeout = 10000': 'PRAGMA busy_timeout=10000',
+      'synchronous = normal': 'PRAGMA synchronous=NORMAL',
+      'temp_store = memory': 'PRAGMA temp_store=MEMORY'
+    } as Record<string, string>;
+
+    this.connection.exec(mapped[normalized] ?? `PRAGMA ${command}`);
+  }
+
+  close(): void {
+    this.connection.close();
+  }
+}
+
+let db: DbLike | undefined;
+
+export function getDb(): DbLike {
   if (!db) {
     fs.mkdirSync(DB_DIR, { recursive: true });
-    db = new Database(DB_PATH);
+    db = new SqliteCompatDatabase(DB_PATH);
     db.pragma('journal_mode = WAL');
     db.pragma('foreign_keys = ON');
     // Allow up to 10 s of retries when another writer holds the lock
@@ -27,7 +77,7 @@ export function getDb(): Database.Database {
 }
 
 function initSchema(): void {
-  const database = db;
+  const database = getDb();
 
   database.exec(`
     CREATE TABLE IF NOT EXISTS admins (
@@ -145,14 +195,27 @@ function initSchema(): void {
 
 export function seedSuperAdmin(username: string, password: string): void {
   const database = getDb();
-  const existing = database.prepare('SELECT id FROM admins WHERE role = ?').get('super_admin');
+  const existing = database.prepare('SELECT id, username, role, status FROM admins WHERE username = ?').get(username) as {
+    id: string;
+    username: string;
+    role: string;
+    status: string;
+  } | undefined;
+
+  const hash = bcrypt.hashSync(password, 12);
+
   if (!existing) {
-    const hash = bcrypt.hashSync(password, 12);
     database.prepare(
       'INSERT INTO admins (id, username, password_hash, role, status) VALUES (?, ?, ?, ?, ?)'
     ).run(uuidv4(), username, hash, 'super_admin', 'active');
     console.log(`[DB] Super admin '${username}' created.`);
+    return;
   }
+
+  database.prepare(
+    'UPDATE admins SET password_hash = ?, role = ?, status = ?, updated_at = datetime(\'now\') WHERE id = ?'
+  ).run(hash, 'super_admin', 'active', existing.id);
+  console.log(`[DB] Super admin '${username}' updated.`);
 }
 
 export function logAction(

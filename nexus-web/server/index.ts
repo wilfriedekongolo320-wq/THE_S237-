@@ -50,13 +50,15 @@ if (config.jwt_secret && !process.env.NEXUS_JWT_SECRET) {
 }
 
 const PORT_CANDIDATES = [2087, 2096, 8787, 3001, 9090];
-const configuredPort  = config.port ?? (
-  process.env.NEXUS_PORT ? parseInt(process.env.NEXUS_PORT, 10) : 0
-);
+const configuredPort = (() => {
+  const candidate = process.env.PORT || process.env.NEXUS_PORT || (config.port ? String(config.port) : '0');
+  const parsed = Number.parseInt(candidate, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+})();
 
 // ─── Bootstrap super admin ────────────────────────────────────────────────────
 const adminUser = config.admin_user || process.env.NEXUS_ADMIN_USER || 'admin';
-const adminPass = config.admin_password || process.env.NEXUS_ADMIN_PASS || 'admin123';
+const adminPass = config.admin_password || process.env.NEXUS_ADMIN_PASS || 'admin';
 
 getDb();
 seedSuperAdmin(adminUser, adminPass);
@@ -172,7 +174,13 @@ app.use('/api/auditlogs', apiLimiter,  auditLogsRouter);
 // Swagger docs
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Health check
+// Health checks
+app.get('/health', (_req, res) => {
+  const db = getDb();
+  const row = db.prepare("SELECT COUNT(*) as n FROM clients").get() as any;
+  res.json({ status: 'ok', clients: row.n, ts: new Date().toISOString() });
+});
+
 app.get('/api/health', (_req, res) => {
   const db = getDb();
   const row = db.prepare("SELECT COUNT(*) as n FROM clients").get() as any;

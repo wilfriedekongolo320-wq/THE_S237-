@@ -49,7 +49,41 @@ L'installateur vous demandera :
 
 ---
 
-## 🐳 Méthode 3 — Docker Compose (stack complète)
+## ⚙️ Méthode 3 — Déploiement VPS fiable (recommandé)
+
+Si tu veux un déploiement propre sur un VPS Ubuntu, utilise le script et le service système déjà préparés dans le dépôt.
+
+```bash
+# 1. Cloner le dépôt
+sudo apt update && sudo apt install -y git curl
+git clone https://github.com/abesskamer237/KATASHIE_VPN.git
+cd KATASHIE_VPN
+
+# 2. Installer le panneau web et le service systemd
+sudo bash install_web_panel_vps.sh
+```
+
+Ce script va :
+- installer les dépendances Node.js du panneau,
+- compiler l’interface et le backend,
+- copier l’application dans /opt/katashie-web,
+- créer le service systemd,
+- et démarrer automatiquement le panneau sur le port 2087.
+
+Vérification rapide :
+
+```bash
+sudo systemctl status katashie-web
+curl http://127.0.0.1:2087/health
+```
+
+Identifiants par défaut après démarrage :
+- utilisateur : admin
+- mot de passe : admin
+
+---
+
+## 🐳 Méthode 4 — Docker Compose (stack complète)
 
 ```bash
 # 1. Cloner le dépôt

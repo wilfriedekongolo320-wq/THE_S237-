@@ -1,17 +1,22 @@
 [Unit]
-Description=KATASHIE VPN — Web Management Panel
+Description=KATASHIE VPN Web Panel
 After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/etc/katashie-web
-ExecStart=/usr/bin/node /etc/katashie-web/server/index.js
+User=root
+WorkingDirectory=/opt/katashie-web
+Environment=NODE_ENV=production
+Environment=PORT=2087
+Environment=KATASHIE_DB_DIR=/etc/katashie-web
+Environment=NEXUS_ADMIN_USER=admin
+Environment=NEXUS_ADMIN_PASS=admin
+Environment=NEXUS_JWT_SECRET=change-me
+ExecStart=/usr/bin/node /opt/katashie-web/dist/server/index.js
 Restart=always
 RestartSec=5
 StandardOutput=journal
 StandardError=journal
-Environment=NODE_ENV=production
-Environment=NEXUS_DB_DIR=/etc/katashie-tunnel-web
 
 [Install]
 WantedBy=multi-user.target
