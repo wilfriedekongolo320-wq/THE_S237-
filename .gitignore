@@ -2,3 +2,32 @@
 venv/
 __pycache__/
 *.py[cod]
+
+# Node / package managers
+node_modules/
+**/node_modules/
+pnpm-lock.yaml
+package-lock.json
+**/package-lock.json
+
+# Build outputs
+/dist/
+**/dist/
+/build/
+**/build/
+.vite/
+**/.vite/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
