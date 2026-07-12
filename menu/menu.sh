@@ -11,6 +11,42 @@ if command -v readlink >/dev/null 2>&1; then
         SCRIPT_DIR="$(cd "$(dirname "$real_path")" && pwd)"
     fi
 fi
+resolve_repo_root() {
+    local dir
+    local candidate
+    for candidate in "$SCRIPT_DIR" "$(pwd)" "$HOME" /root /opt /usr/local/src; do
+        if [ -d "$candidate/katashie_core_bot" ] && [ -f "$candidate/katashie_core_bot/install.sh" ]; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+        if [ -d "$candidate/katashie_deploy_bot" ] && [ -f "$candidate/katashie_deploy_bot/install.sh" ]; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+        if [ -d "$candidate/katashie_whatsapp_bot" ] && [ -f "$candidate/katashie_whatsapp_bot/install.sh" ]; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    done
+    for dir in "$SCRIPT_DIR" "$(pwd)"; do
+        while [ "$dir" != "/" ] && [ -n "$dir" ]; do
+            if [ -d "$dir/katashie_core_bot" ] && [ -f "$dir/katashie_core_bot/install.sh" ]; then
+                printf '%s\n' "$dir"
+                return 0
+            fi
+            if [ -d "$dir/katashie_deploy_bot" ] && [ -f "$dir/katashie_deploy_bot/install.sh" ]; then
+                printf '%s\n' "$dir"
+                return 0
+            fi
+            if [ -d "$dir/katashie_whatsapp_bot" ] && [ -f "$dir/katashie_whatsapp_bot/install.sh" ]; then
+                printf '%s\n' "$dir"
+                return 0
+            fi
+            dir="$(dirname "$dir")"
+        done
+    done
+    return 1
+}
 cat << 'BANNER'
  ██╗  ██╗ █████╗ ████████╗ █████╗ ███████╗██╗  ██╗██╗███████╗
  ██║ ██╔╝██╔══██╗╚══██╔══╝██╔══██╗██╔════╝██║  ██║██║██╔════╝
@@ -158,9 +194,51 @@ case $opt in
 12)     clear ; exec bash "$SCRIPT_DIR/port.sh" ;;
 13)     clear ; exec bash "$SCRIPT_DIR/log.sh" ;;
 14)     clear ; exec bash "$SCRIPT_DIR/fastdns.sh" ;;
-15)     clear ; bash "$SCRIPT_DIR/../katashie_core_bot/install.sh" ;;
-16)     clear ; bash "$SCRIPT_DIR/../katashie_deploy_bot/install.sh" ;;
-17)     clear ; bash "$SCRIPT_DIR/../katashie_whatsapp_bot/install.sh" ;;
+15)
+        clear
+        repo_root="$(resolve_repo_root || true)"
+        if [ -n "$repo_root" ] && [ -x "$repo_root/katashie_core_bot/install.sh" ]; then
+            exec bash "$repo_root/katashie_core_bot/install.sh"
+        elif [ -x "$SCRIPT_DIR/../katashie_core_bot/install.sh" ]; then
+            exec bash "$SCRIPT_DIR/../katashie_core_bot/install.sh"
+        elif [ -x "/usr/local/sbin/katashie_core_bot/install.sh" ]; then
+            exec bash "/usr/local/sbin/katashie_core_bot/install.sh"
+        else
+            echo -e "${RED}Erreur : install.sh de Bot Telegram introuvable.${NC}"
+            sleep 2
+            exec bash "$SCRIPT_DIR/menu.sh"
+        fi
+        ;;
+16)
+        clear
+        repo_root="$(resolve_repo_root || true)"
+        if [ -n "$repo_root" ] && [ -x "$repo_root/katashie_deploy_bot/install.sh" ]; then
+            exec bash "$repo_root/katashie_deploy_bot/install.sh"
+        elif [ -x "$SCRIPT_DIR/../katashie_deploy_bot/install.sh" ]; then
+            exec bash "$SCRIPT_DIR/../katashie_deploy_bot/install.sh"
+        elif [ -x "/usr/local/sbin/katashie_deploy_bot/install.sh" ]; then
+            exec bash "/usr/local/sbin/katashie_deploy_bot/install.sh"
+        else
+            echo -e "${RED}Erreur : install.sh de Bot Deploy introuvable.${NC}"
+            sleep 2
+            exec bash "$SCRIPT_DIR/menu.sh"
+        fi
+        ;;
+17)
+        clear
+        repo_root="$(resolve_repo_root || true)"
+        if [ -n "$repo_root" ] && [ -x "$repo_root/katashie_whatsapp_bot/install.sh" ]; then
+            exec bash "$repo_root/katashie_whatsapp_bot/install.sh"
+        elif [ -x "$SCRIPT_DIR/../katashie_whatsapp_bot/install.sh" ]; then
+            exec bash "$SCRIPT_DIR/../katashie_whatsapp_bot/install.sh"
+        elif [ -x "/usr/local/sbin/katashie_whatsapp_bot/install.sh" ]; then
+            exec bash "/usr/local/sbin/katashie_whatsapp_bot/install.sh"
+        else
+            echo -e "${RED}Erreur : install.sh de Bot WhatsApp introuvable.${NC}"
+            sleep 2
+            exec bash "$SCRIPT_DIR/menu.sh"
+        fi
+        ;;
 18)
         clear
         if [ -x "$SCRIPT_DIR/web.sh" ]; then
