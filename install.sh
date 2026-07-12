@@ -51,11 +51,29 @@ apt-get update -y >/dev/null 2>&1
 apt-get install -y curl wget git openssl sqlite3 >/dev/null 2>&1
 
 # Node.js 20 LTS
-if ! command -v node &>/dev/null || [[ "$(node --version | cut -d. -f1 | tr -d 'v')" -lt 20 ]]; then
+ensure_node20() {
+    if ! command -v node &>/dev/null; then
+        return 1
+    fi
+    local node_version
+    node_version=$(node --version 2>/dev/null | tr -d 'v' | cut -d. -f1)
+    if [ -z "$node_version" ]; then
+        return 1
+    fi
+    [ "$node_version" -ge 20 ]
+}
+
+if ! ensure_node20; then
     log_info "Installation de Node.js 20 LTS..."
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - >/dev/null 2>&1
     apt-get install -y nodejs >/dev/null 2>&1
 fi
+
+if ! ensure_node20; then
+    log_error "Node.js 20+ n'a pas pu être installé. Vérifiez votre environnement."
+fi
+
+node --version >/dev/null 2>&1 || log_error "Node.js introuvable après installation"
 log_success "Node.js $(node --version)"
 
 # PM2
@@ -156,16 +174,22 @@ fi
 # ─── Étape 5 : Installer les dépendances Node.js ─────────────
 log_info "Installation des dépendances npm..."
 cd "$INSTALL_DIR"
+# Force a compatible Node engine for all installs
+export npm_config_engine_strict=false
 npm install --omit=dev 2>/dev/null || npm install
 log_success "Dépendances installées."
 
 # ─── Étape 6 : Builder le serveur TypeScript ─────────────────
 log_info "Compilation du serveur TypeScript..."
-npm run build:server 2>/dev/null || npx tsc 2>/dev/null || \
-    npx esbuild server/index.ts \
-        --bundle --platform=node --target=node20 \
-        --outfile=dist/server.js \
-        --external:better-sqlite3 --external:bcryptjs --external:qrcode
+if ! npm run build:server 2>/dev/null; then
+    if command -v npx >/dev/null 2>&1; then
+        npx tsc 2>/dev/null || \
+            npx esbuild server/index.ts \
+                --bundle --platform=node --target=node20 \
+                --outfile=dist/server.js \
+                --external:better-sqlite3 --external:bcryptjs --external:qrcode
+    fi
+fi
 log_success "Serveur compilé."
 
 # ─── Étape 7 : Builder le frontend React ─────────────────────

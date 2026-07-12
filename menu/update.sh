@@ -57,10 +57,8 @@ if [ -d "$NEXUS_WEB_DIR" ] && [ -f "$NEXUS_WEB_DIR/dist/server/index.js" ]; then
   if git clone --depth 1 "$NEXUS_REPO_URL" "$NTW_TMP" >/dev/null 2>&1; then
     if [ -d "$NTW_TMP/nexus-web" ]; then
       cp -rf "$NTW_TMP/nexus-web"/. "$NEXUS_WEB_DIR/"
-      sed -i "s|const PUBLIC_DIR = .*|const PUBLIC_DIR = '/opt/katashie-web/public';|g" \
-          "$NEXUS_WEB_DIR/server/index.ts" 2>/dev/null || true
-      sed -i 's/callback(null, false);/callback(null, true);/g' \
-          "$NEXUS_WEB_DIR/server/index.ts" 2>/dev/null || true
+      sed -i "s|const PUBLIC_DIR = .*|const PUBLIC_DIR = '/opt/katashie-web/public';|g" "$NEXUS_WEB_DIR/server/index.ts" 2>/dev/null || true
+      sed -i 's/callback(null, false);/callback(null, true);/g' "$NEXUS_WEB_DIR/server/index.ts" 2>/dev/null || true
       if [ -d "$NEXUS_WEB_DIR/frontend" ]; then
         cd "$NEXUS_WEB_DIR/frontend" && npm install --quiet >/dev/null 2>&1 && npm run build >/dev/null 2>&1
       fi

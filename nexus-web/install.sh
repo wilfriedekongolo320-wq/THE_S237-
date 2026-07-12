@@ -19,6 +19,12 @@ cd "$(dirname "$0")"
 
 if command -v npm >/dev/null 2>&1; then
   echo "[nexus-web] Installing Node dependencies and building assets..."
+  if ! node --version >/dev/null 2>&1 || [[ "$(node --version | tr -d 'v' | cut -d. -f1)" -lt 20 ]]; then
+    echo "[nexus-web] Node.js 20+ is required. Installing Node.js 20 LTS..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - >/dev/null 2>&1 || true
+    apt-get update -y >/dev/null 2>&1 || true
+    apt-get install -y nodejs >/dev/null 2>&1 || true
+  fi
   npm install
   npm run build
   echo "[nexus-web] Build complete. Copying files to /opt/katashie-web (requires sudo)"
