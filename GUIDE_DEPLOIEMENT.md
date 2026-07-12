@@ -83,7 +83,33 @@ Identifiants par défaut après démarrage :
 
 ---
 
-## 🐳 Méthode 4 — Docker Compose (stack complète)
+## � Méthode 4 — Déploiement local automatique du panneau web
+
+Un script de déploiement local est disponible dans la racine du dépôt :
+
+```bash
+sudo bash deploy_local_nexus_web.sh
+```
+
+Ce script fait automatiquement :
+- vérifie et installe Node.js 20+,
+- installe les dépendances backend et frontend,
+- compile le serveur et l’interface React,
+- copie le projet dans `/opt/katashie-web`,
+- crée et démarre le service systemd `katashie-web`.
+
+Tu peux utiliser cette méthode lorsque tu veux uniquement déployer le panneau localement sans Docker.
+
+Vérification rapide :
+
+```bash
+sudo systemctl status katashie-web
+curl http://127.0.0.1:2087/health
+```
+
+---
+
+## 🐳 Méthode 5 — Docker Compose (stack complète)
 
 ```bash
 # 1. Cloner le dépôt
@@ -105,6 +131,18 @@ docker-compose logs -f katashie-web
 
 ## 🌐 Configuration SSL avec Nginx (domaine HTTPS)
 
+Le dépôt inclut également un script d'automatisation HTTPS pour simplifier la configuration :
+
+```bash
+sudo bash enable_https.sh ton-domaine.com
+```
+
+Options disponibles :
+- `--docker` : redémarre Nginx via Docker Compose
+- `--no-restart` : met à jour le certificat et `nginx.conf` sans recharger Nginx
+
+### Méthode manuelle
+
 ```bash
 # 1. Installer Certbot
 apt install -y certbot
@@ -117,7 +155,11 @@ nano nginx.conf
 # → Remplacez VOTRE_DOMAINE.COM par votre vrai domaine
 
 # 4. Relancer Nginx
+# Si vous utilisez Docker Compose :
 docker-compose restart nginx
+# Si vous utilisez Nginx système :
+sudo nginx -t
+sudo systemctl reload nginx
 ```
 
 ---
