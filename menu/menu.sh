@@ -14,7 +14,7 @@ fi
 resolve_repo_root() {
     local dir
     local candidate
-    for candidate in "$SCRIPT_DIR" "$(pwd)" "$HOME" /root /opt /usr/local/src; do
+    for candidate in "$SCRIPT_DIR" "$(pwd)" "$HOME" /root /opt /usr/local/src /tmp; do
         if [ -d "$candidate/katashie_core_bot" ] && [ -f "$candidate/katashie_core_bot/install.sh" ]; then
             printf '%s\n' "$candidate"
             return 0
@@ -47,6 +47,68 @@ resolve_repo_root() {
     done
     return 1
 }
+
+resolve_bot_installer() {
+    local bot_type="$1"  # katashie_core_bot, katashie_deploy_bot, ou katashie_whatsapp_bot
+    local repo_root
+    
+    repo_root="$(resolve_repo_root 2>/dev/null || true)"
+    if [ -n "$repo_root" ] && [ -f "$repo_root/$bot_type/install.sh" ]; then
+        printf '%s\n' "$repo_root/$bot_type/install.sh"
+        return 0
+    fi
+    
+    # Essayer les chemins alternatifs
+    for path in "$SCRIPT_DIR/../$bot_type/install.sh" "/usr/local/sbin/$bot_type/install.sh" "/opt/$bot_type/install.sh" "/root/$bot_type/install.sh"; do
+        if [ -f "$path" ]; then
+            printf '%s\n' "$path"
+            return 0
+        fi
+    done
+    
+    # Fallback: cloner le repo GitHub
+    if command -v git >/dev/null 2>&1; then
+        local tmpdir="/tmp/katashie_$$"
+        if git clone --depth 1 https://github.com/abesskamer237/KATASHIE_VPN.git "$tmpdir" >/dev/null 2>&1; then
+            if [ -f "$tmpdir/$bot_type/install.sh" ]; then
+                chmod +x "$tmpdir/$bot_type/install.sh"
+                printf '%s\n' "$tmpdir/$bot_type/install.sh"
+                return 0
+            fi
+        fi
+        rm -rf "$tmpdir" 2>/dev/null || true
+    fi
+    
+    return 1
+}
+
+resolve_web_installer() {
+    # Chercher web.sh dans les emplacements courants
+    for path in "$SCRIPT_DIR/web.sh" "/usr/local/sbin/web.sh" "/usr/local/bin/web.sh" "$SCRIPT_DIR/web"; do
+        if [ -f "$path" ]; then
+            printf '%s\n' "$path"
+            return 0
+        fi
+    done
+    
+    # Si web.sh n'existe pas, cloner le repo et copier web.sh
+    if command -v git >/dev/null 2>&1; then
+        local tmpdir="/tmp/katashie_web_$$"
+        if git clone --depth 1 https://github.com/abesskamer237/KATASHIE_VPN.git "$tmpdir" >/dev/null 2>&1; then
+            if [ -f "$tmpdir/menu/web.sh" ]; then
+                cp "$tmpdir/menu/web.sh" /usr/local/sbin/web.sh
+                chmod +x /usr/local/sbin/web.sh
+                printf '%s\n' "/usr/local/sbin/web.sh"
+                rm -rf "$tmpdir" 2>/dev/null || true
+                return 0
+            fi
+        fi
+        rm -rf "$tmpdir" 2>/dev/null || true
+    fi
+    
+    return 1
+}
+
 cat << 'BANNER'
  ██╗  ██╗ █████╗ ████████╗ █████╗ ███████╗██╗  ██╗██╗███████╗
  ██║ ██╔╝██╔══██╗╚══██╔══╝██╔══██╗██╔════╝██║  ██║██║██╔════╝
@@ -196,64 +258,69 @@ case $opt in
 14)     clear ; exec bash "$SCRIPT_DIR/fastdns.sh" ;;
 15)
         clear
-        repo_root="$(resolve_repo_root || true)"
-        if [ -n "$repo_root" ] && [ -x "$repo_root/katashie_core_bot/install.sh" ]; then
-            exec bash "$repo_root/katashie_core_bot/install.sh"
-        elif [ -x "$SCRIPT_DIR/../katashie_core_bot/install.sh" ]; then
-            exec bash "$SCRIPT_DIR/../katashie_core_bot/install.sh"
-        elif [ -x "/usr/local/sbin/katashie_core_bot/install.sh" ]; then
-            exec bash "/usr/local/sbin/katashie_core_bot/install.sh"
+        installer="$(resolve_bot_installer katashie_core_bot 2>/dev/null || true)"
+        if [ -n "$installer" ] && [ -x "$installer" ]; then
+            exec bash "$installer"
         else
             echo -e "${RED}Erreur : install.sh de Bot Telegram introuvable.${NC}"
-            sleep 2
+            echo -e "${YELLOW}Le repo GitHub n'a pas pu être cloné. Vérifiez:${NC}"
+            echo "  • La connexion Internet est OK"
+            echo "  • git est installé: command -v git"
+            echo "  • Vous pouvez le cloner manuellement:"
+            echo "    git clone https://github.com/abesskamer237/KATASHIE_VPN.git /root/KATASHIE_VPN"
+            echo ""
+            sleep 3
             exec bash "$SCRIPT_DIR/menu.sh"
         fi
         ;;
 16)
         clear
-        repo_root="$(resolve_repo_root || true)"
-        if [ -n "$repo_root" ] && [ -x "$repo_root/katashie_deploy_bot/install.sh" ]; then
-            exec bash "$repo_root/katashie_deploy_bot/install.sh"
-        elif [ -x "$SCRIPT_DIR/../katashie_deploy_bot/install.sh" ]; then
-            exec bash "$SCRIPT_DIR/../katashie_deploy_bot/install.sh"
-        elif [ -x "/usr/local/sbin/katashie_deploy_bot/install.sh" ]; then
-            exec bash "/usr/local/sbin/katashie_deploy_bot/install.sh"
+        installer="$(resolve_bot_installer katashie_deploy_bot 2>/dev/null || true)"
+        if [ -n "$installer" ] && [ -x "$installer" ]; then
+            exec bash "$installer"
         else
             echo -e "${RED}Erreur : install.sh de Bot Deploy introuvable.${NC}"
-            sleep 2
+            echo -e "${YELLOW}Le repo GitHub n'a pas pu être cloné. Vérifiez:${NC}"
+            echo "  • La connexion Internet est OK"
+            echo "  • git est installé: command -v git"
+            echo "  • Vous pouvez le cloner manuellement:"
+            echo "    git clone https://github.com/abesskamer237/KATASHIE_VPN.git /root/KATASHIE_VPN"
+            echo ""
+            sleep 3
             exec bash "$SCRIPT_DIR/menu.sh"
         fi
         ;;
 17)
         clear
-        repo_root="$(resolve_repo_root || true)"
-        if [ -n "$repo_root" ] && [ -x "$repo_root/katashie_whatsapp_bot/install.sh" ]; then
-            exec bash "$repo_root/katashie_whatsapp_bot/install.sh"
-        elif [ -x "$SCRIPT_DIR/../katashie_whatsapp_bot/install.sh" ]; then
-            exec bash "$SCRIPT_DIR/../katashie_whatsapp_bot/install.sh"
-        elif [ -x "/usr/local/sbin/katashie_whatsapp_bot/install.sh" ]; then
-            exec bash "/usr/local/sbin/katashie_whatsapp_bot/install.sh"
+        installer="$(resolve_bot_installer katashie_whatsapp_bot 2>/dev/null || true)"
+        if [ -n "$installer" ] && [ -x "$installer" ]; then
+            exec bash "$installer"
         else
             echo -e "${RED}Erreur : install.sh de Bot WhatsApp introuvable.${NC}"
-            sleep 2
+            echo -e "${YELLOW}Le repo GitHub n'a pas pu être cloné. Vérifiez:${NC}"
+            echo "  • La connexion Internet est OK"
+            echo "  • git est installé: command -v git"
+            echo "  • Vous pouvez le cloner manuellement:"
+            echo "    git clone https://github.com/abesskamer237/KATASHIE_VPN.git /root/KATASHIE_VPN"
+            echo ""
+            sleep 3
             exec bash "$SCRIPT_DIR/menu.sh"
         fi
         ;;
 18)
         clear
-        if [ -x "$SCRIPT_DIR/web.sh" ]; then
-            exec bash "$SCRIPT_DIR/web.sh"
-        elif [ -x "/usr/local/sbin/web.sh" ]; then
-            exec bash "/usr/local/sbin/web.sh"
-        elif [ -x "/usr/local/bin/web.sh" ]; then
-            exec bash "/usr/local/bin/web.sh"
-        elif [ -x "$SCRIPT_DIR/web" ]; then
-            exec bash "$SCRIPT_DIR/web"
-        elif [ -x "/usr/local/sbin/web" ]; then
-            exec bash "/usr/local/sbin/web"
+        web_script="$(resolve_web_installer 2>/dev/null || true)"
+        if [ -n "$web_script" ] && [ -f "$web_script" ]; then
+            exec bash "$web_script"
         else
-            echo -e "${RED}Erreur : web.sh introuvable. Vérifiez l'installation du menu.${NC}"
-            sleep 2
+            echo -e "${RED}Erreur : web.sh du panneau introuvable.${NC}"
+            echo -e "${YELLOW}Le repo GitHub n'a pas pu être cloné. Vérifiez:${NC}"
+            echo "  • La connexion Internet est OK"
+            echo "  • git est installé: command -v git"
+            echo "  • Vous pouvez le cloner manuellement:"
+            echo "    git clone https://github.com/abesskamer237/KATASHIE_VPN.git /root/KATASHIE_VPN"
+            echo ""
+            sleep 3
             exec bash "$SCRIPT_DIR/menu.sh"
         fi
         ;;

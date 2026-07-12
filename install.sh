@@ -45,36 +45,34 @@ cat << 'BANNER'
 BANNER
 echo -e "${NC}"
 
+# ─── PRE-FLIGHT: Force Node.js 20+ ──────────────────────────
+echo -e "${BLUE}[PRE-FLIGHT]${NC} Checking Node.js version..."
+if ! command -v node >/dev/null 2>&1; then
+    log_info "Installing Node.js 20 LTS..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x 2>/dev/null | bash - || true
+    apt-get update -qq >/dev/null 2>&1 || true
+    apt-get install -y nodejs >/dev/null 2>&1 || true
+fi
+
+NODE_MAJOR=$(node --version 2>/dev/null | tr -d 'v' | cut -d. -f1 || echo '0')
+if [ "$NODE_MAJOR" -lt 20 ]; then
+    log_warn "Node.js $NODE_MAJOR detected. Forcing upgrade to Node.js 20 LTS..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x 2>/dev/null | bash - || true
+    apt-get update -qq >/dev/null 2>&1 || true
+    apt-get install -y --only-upgrade nodejs >/dev/null 2>&1 || true
+    
+    NODE_NEW=$(node --version 2>/dev/null | tr -d 'v' | cut -d. -f1 || echo '0')
+    if [ "$NODE_NEW" -lt 20 ]; then
+        log_error "Node.js upgrade failed. Node $NODE_NEW still too old. Please upgrade Node.js manually to 20+."
+    fi
+fi
+
+log_success "Node.js $(node --version) ready."
+
 # ─── Étape 1 : Vérifier les dépendances système ──────────────
 log_info "Vérification des dépendances système..."
 apt-get update -y >/dev/null 2>&1
 apt-get install -y curl wget git openssl sqlite3 >/dev/null 2>&1
-
-# Node.js 20 LTS
-ensure_node20() {
-    if ! command -v node &>/dev/null; then
-        return 1
-    fi
-    local node_version
-    node_version=$(node --version 2>/dev/null | tr -d 'v' | cut -d. -f1)
-    if [ -z "$node_version" ]; then
-        return 1
-    fi
-    [ "$node_version" -ge 20 ]
-}
-
-if ! ensure_node20; then
-    log_info "Installation de Node.js 20 LTS..."
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - >/dev/null 2>&1
-    apt-get install -y nodejs >/dev/null 2>&1
-fi
-
-if ! ensure_node20; then
-    log_error "Node.js 20+ n'a pas pu être installé. Vérifiez votre environnement."
-fi
-
-node --version >/dev/null 2>&1 || log_error "Node.js introuvable après installation"
-log_success "Node.js $(node --version)"
 
 # PM2
 if ! command -v pm2 &>/dev/null; then
