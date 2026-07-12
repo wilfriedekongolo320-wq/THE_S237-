@@ -344,19 +344,23 @@ restart_services() {
     log_step "Activation et redémarrage des services..."
     local SERVICES=(ssh dropbear stunnel5 cron nginx vnstat fail2ban ws-dropbear ws-stunnel xray runn squid openvpn ohp zivpn dnstt udp-custom)
     for svc in "${SERVICES[@]}"; do
-        if systemctl list-unit-files 2>/dev/null | grep -q "^${svc}.service"; then
-            systemctl enable "$svc" --now >/dev/null 2>&1 && \
-            systemctl restart "$svc" >/dev/null 2>&1 && \
-            echo -ne "${GREEN}✔${NC} ${svc} " || \
-            echo -ne "${YELLOW}⚠${NC} ${svc} "
+        if systemctl list-unit-files 2>/dev/null | grep -Eq "^${svc}(\\.service)?"; then
+            systemctl daemon-reload >/dev/null 2>&1 || true
+            systemctl enable "$svc" >/dev/null 2>&1 || true
+            if systemctl restart "$svc" >/dev/null 2>&1 || service "$svc" restart >/dev/null 2>&1; then
+                echo -ne "${GREEN}✔${NC} ${svc} "
+            else
+                echo -ne "${YELLOW}⚠${NC} ${svc} "
+            fi
         fi
     done
     for port in 7100 7200 7300; do
         svc="badvpn@${port}"
         if systemctl list-unit-files 2>/dev/null | grep -q "^${svc}.service"; then
-            systemctl enable "$svc" --now >/dev/null 2>&1 && \
-            systemctl restart "$svc" >/dev/null 2>&1 && \
-            echo -ne "${GREEN}✔${NC} badvpn:${port} "
+            if systemctl enable "$svc" >/dev/null 2>&1 && \
+               (systemctl restart "$svc" >/dev/null 2>&1 || true); then
+                echo -ne "${GREEN}✔${NC} badvpn:${port} "
+            fi
         fi
     done
     echo ""

@@ -5,6 +5,12 @@
 # ============================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if command -v readlink >/dev/null 2>&1; then
+    real_path=$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || true)
+    if [ -n "$real_path" ]; then
+        SCRIPT_DIR="$(cd "$(dirname "$real_path")" && pwd)"
+    fi
+fi
 cat << 'BANNER'
  ██╗  ██╗ █████╗ ████████╗ █████╗ ███████╗██╗  ██╗██╗███████╗
  ██║ ██╔╝██╔══██╗╚══██╔══╝██╔══██╗██╔════╝██║  ██║██║██╔════╝
@@ -155,9 +161,41 @@ case $opt in
 15)     clear ; bash "$SCRIPT_DIR/../katashie_core_bot/install.sh" ;;
 16)     clear ; bash "$SCRIPT_DIR/../katashie_deploy_bot/install.sh" ;;
 17)     clear ; bash "$SCRIPT_DIR/../katashie_whatsapp_bot/install.sh" ;;
-18)     clear ; exec bash "$SCRIPT_DIR/web.sh" ;;
+18)
+        clear
+        if [ -x "$SCRIPT_DIR/web.sh" ]; then
+            exec bash "$SCRIPT_DIR/web.sh"
+        elif [ -x "/usr/local/sbin/web.sh" ]; then
+            exec bash "/usr/local/sbin/web.sh"
+        elif [ -x "/usr/local/bin/web.sh" ]; then
+            exec bash "/usr/local/bin/web.sh"
+        elif [ -x "$SCRIPT_DIR/web" ]; then
+            exec bash "$SCRIPT_DIR/web"
+        elif [ -x "/usr/local/sbin/web" ]; then
+            exec bash "/usr/local/sbin/web"
+        else
+            echo -e "${RED}Erreur : web.sh introuvable. Vérifiez l'installation du menu.${NC}"
+            sleep 2
+            exec bash "$SCRIPT_DIR/menu.sh"
+        fi
+        ;;
 88)     reboot ;;
-99)     clear ; exec bash "$SCRIPT_DIR/update.sh" ;;
+99)
+        clear
+        if [ -x "/usr/local/sbin/update.sh" ]; then
+            exec bash "/usr/local/sbin/update.sh"
+        elif [ -x "/usr/local/sbin/update" ]; then
+            exec bash "/usr/local/sbin/update"
+        elif [ -x "$SCRIPT_DIR/update.sh" ]; then
+            exec bash "$SCRIPT_DIR/update.sh"
+        elif [ -x "$SCRIPT_DIR/update" ]; then
+            exec bash "$SCRIPT_DIR/update"
+        else
+            echo -e "${RED}Erreur : script de mise à jour introuvable.${NC}"
+            sleep 2
+            exec bash "$SCRIPT_DIR/menu.sh"
+        fi
+        ;;
 0 | 00) exit 0 ;;
 *)      clear ; exec bash "$SCRIPT_DIR/menu.sh" ;;
 esac

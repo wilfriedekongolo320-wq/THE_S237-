@@ -49,18 +49,72 @@ sed -i '/^exit 0/i echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.lo
 configure_nginx() {
 apt-get install -y nginx
 rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
-wget -q -O /etc/nginx/nginx.conf "${SERVER_HOST}/module/nginx.conf"
 rm -f /etc/nginx/conf.d/default.conf
-mkdir -p /etc/systemd/system/nginx.service.d
+mkdir -p /etc/nginx /etc/systemd/system/nginx.service.d
 printf "[Service]\nExecStartPost=/bin/sleep 0.1\n" > /etc/systemd/system/nginx.service.d/override.conf
+if wget -q -O /tmp/nginx-katashie.conf "${SERVER_HOST}/module/nginx.conf"; then
+    install -m 0644 /tmp/nginx-katashie.conf /etc/nginx/nginx.conf
+fi
+
+if ! nginx -t >/dev/null 2>&1; then
+    cat > /etc/nginx/nginx.conf <<'EOF'
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+events { worker_connections 1024; }
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    sendfile on;
+    keepalive_timeout 65;
+    server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        server_name _;
+        root /home/vps/public_html;
+        index index.html;
+        location / { try_files $uri $uri/ =404; }
+    }
+}
+EOF
+fi
+
 systemctl daemon-reload
-systemctl enable --now nginx
+safe_service_enable nginx
+if ! safe_service_restart nginx; then
+    echo "[WARN] nginx ne peut pas redémarrer, vérifiez /etc/nginx/nginx.conf"
+fi
 }
 setup_web_directories() {
 mkdir -p /home/vps/public_html
 wget -q -O /home/vps/public_html/index.html "${SERVER_HOST}/module/index"
 chown -R www-data:www-data /home/vps/public_html
 }
+
+safe_service_enable() {
+    systemctl enable "$1" >/dev/null 2>&1 || true
+}
+
+safe_service_restart() {
+    if systemctl restart "$1" >/dev/null 2>&1; then
+        return 0
+    fi
+    if service "$1" restart >/dev/null 2>&1; then
+        return 0
+    fi
+    return 1
+}
+
+safe_service_start() {
+    if systemctl start "$1" >/dev/null 2>&1; then
+        return 0
+    fi
+    if service "$1" start >/dev/null 2>&1; then
+        return 0
+    fi
+    return 1
+}
+
 install_badvpn() {
 wget -q -O /usr/bin/badvpn-udpgw "${SERVER_HOST}/module/newudpgw"
 chmod +x /usr/bin/badvpn-udpgw
@@ -75,16 +129,27 @@ configure_ssh_dropbear() {
 apt-get install -y dropbear
 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
 for port in 500 40000 81 51443 58080 666; do
-sed -i "/^Port 22/a Port $port" /etc/ssh/sshd_config
+    sed -i "/^Port 22/a Port $port" /etc/ssh/sshd_config
 done
-systemctl restart ssh
-sed -i 's/^NO_START=1/NO_START=0/' /etc/default/dropbear
-sed -i 's/NO_START=1/NO_START=0/g' /etc/default/dropbear
-sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=143/g' /etc/default/dropbear
-sed -i 's#DROPBEAR_EXTRA_ARGS=.*#DROPBEAR_EXTRA_ARGS="-p 50000 -p 109 -p 110 -p 69"#g' /etc/default/dropbear
-echo "/bin/false" >> /etc/shells
-echo "/usr/sbin/nologin" >> /etc/shells
-systemctl enable --now dropbear
+systemctl restart ssh >/dev/null 2>&1 || true
+mkdir -p /etc/default
+cat > /etc/default/dropbear <<'EOF'
+NO_START=0
+DROPBEAR_PORT=143
+DROPBEAR_EXTRA_ARGS="-p 50000 -p 109 -p 110 -p 69"
+DROPBEAR_BANNER=/etc/issue.net
+EOF
+chmod 644 /etc/default/dropbear
+if [ ! -f /etc/issue.net ]; then
+    echo "Authorized connections only." > /etc/issue.net
+fi
+for shell_path in /bin/false /usr/sbin/nologin; do
+    grep -qxF "$shell_path" /etc/shells || echo "$shell_path" >> /etc/shells
+done
+systemctl enable dropbear >/dev/null 2>&1 || true
+if ! systemctl restart dropbear >/dev/null 2>&1 && ! service dropbear restart >/dev/null 2>&1; then
+    echo "[WARN] dropbear ne peut pas redémarrer. Vérifiez /etc/default/dropbear et les ports 109/143."
+fi
 }
 configure_stunnel() {
 STUNNEL_VERSION="5.75"

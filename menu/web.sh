@@ -6,6 +6,14 @@
 
 resolve_script_dir() {
   local source="${BASH_SOURCE[0]}"
+  if command -v readlink >/dev/null 2>&1; then
+    local real_path
+    real_path=$(readlink -f "$source" 2>/dev/null || true)
+    if [ -n "$real_path" ]; then
+      source="$real_path"
+    fi
+  fi
+
   local dir=""
   while [ -L "$source" ]; do
     dir="$(cd -P "$(dirname "$source")" && pwd 2>/dev/null || pwd)"
@@ -191,13 +199,18 @@ api_call() {
 
 resolve_web_installer() {
   local base
-  base="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  base="$(resolve_script_dir)"
 
   local candidates=(
     "$base/../nexus-web/install.sh"
     "$base/../install.sh"
+    "$base/../../nexus-web/install.sh"
+    "$base/../../install.sh"
     "/usr/local/sbin/nexus-web/install.sh"
+    "/usr/local/sbin/install.sh"
     "/opt/katashie-web/install.sh"
+    "/root/nexus-web/install.sh"
+    "/root/install.sh"
   )
 
   local candidate
@@ -207,6 +220,17 @@ resolve_web_installer() {
       return 0
     fi
   done
+
+  if command -v git >/dev/null 2>&1; then
+    rm -rf "$TMP_WEB_SRC"
+    if GIT_TERMINAL_PROMPT=0 git clone --depth 1 "$NEXUS_REPO_URL" "$TMP_WEB_SRC" >/dev/null 2>&1; then
+      candidate="$TMP_WEB_SRC/nexus-web/install.sh"
+      if [ -f "$candidate" ]; then
+        echo "$candidate"
+        return 0
+      fi
+    fi
+  fi
 
   return 1
 }
@@ -300,10 +324,12 @@ function ntw_install() {
     echo -e "${RD}  [ERROR] Source install script not found.${NC}"
     echo -e "  Expected one of:"
     echo -e "    - /usr/local/sbin/nexus-web/install.sh"
+    echo -e "    - /usr/local/sbin/install.sh"
     echo -e "    - /opt/katashie-web/install.sh"
+    echo -e "    - /root/nexus-web/install.sh"
     echo -e "    - <repo>/nexus-web/install.sh"
     echo -e "    - <repo>/install.sh"
-    echo -e "  Tip: check internet access if auto-fetch failed."
+    echo -e "  Tip: verify internet access, git availability, and that the repo URL is reachable."
     wait_key
     nexus_web_menu
     return

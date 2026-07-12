@@ -110,12 +110,37 @@ configure_nginx() {
 log "Downloading nginx xray conf"
 apt_install nginx
 domain=$(cat /root/domain 2>/dev/null || cat /etc/xray/domain 2>/dev/null || err "Domain file not found!")
-wget -q -O /etc/nginx/nginx.conf "${SERVER_HOST}/module/nginx.conf"
+mkdir -p /etc/nginx
+if wget -q -O /tmp/nginx-katashie.conf "${SERVER_HOST}/module/nginx.conf"; then
+install -m 0644 /tmp/nginx-katashie.conf /etc/nginx/nginx.conf
 sleep 3
 domain=$(cat /etc/xray/domain)
 sed -i "s/server_name \*\.xxxxxx;/server_name *.$domain;/" /etc/nginx/nginx.conf
 sed -i "s/server_name xxxxxx;/server_name $domain;/" /etc/nginx/nginx.conf
 sed -i "s#https://xxxxxx:86/#https://$domain:86/#" /etc/nginx/nginx.conf
+fi
+if ! nginx -t >/dev/null 2>&1; then
+cat > /etc/nginx/nginx.conf <<'EOF'
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+events { worker_connections 1024; }
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    sendfile on;
+    keepalive_timeout 65;
+    server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        server_name _;
+        root /home/vps/public_html;
+        index index.html;
+        location / { try_files $uri $uri/ =404; }
+    }
+}
+EOF
+fi
 chmod 644 /etc/nginx/nginx.conf
 chown root:root /etc/nginx/nginx.conf
 systemctl daemon-reload
@@ -123,8 +148,8 @@ systemctl daemon-reload
 restart_services() {
 log "Enabling and restarting services"
 systemctl daemon-reload
-systemctl enable --now xray nginx runn
-systemctl restart xray nginx runn
+systemctl enable xray nginx runn >/dev/null 2>&1 || true
+systemctl restart xray nginx runn >/dev/null 2>&1 || service nginx restart >/dev/null 2>&1 || true
 }
 finalize() {
 [ -f /root/domain ] && mv /root/domain /etc/xray/

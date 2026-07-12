@@ -1,5 +1,9 @@
 #!/bin/bash
 clear
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+if [ -L "${BASH_SOURCE[0]}" ] && command -v readlink >/dev/null 2>&1; then
+    SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" >/dev/null 2>&1 && pwd)"
+fi
 LN='\e[34m'
 NC='\e[0m'
 GR='\e[32m'
@@ -46,6 +50,7 @@ echo -e "${LN}┗━━━━━━━━━━━━━━━━━━━━━
 NEXUS_WEB_DIR="/opt/katashie-web"
 NEXUS_REPO_URL="https://github.com/abesskamer237/KATASHIE_VPN.git"
 NTW_TMP="$(mktemp -d)"
+trap 'rm -rf "$NTW_TMP"' EXIT
 
 if [ -d "$NEXUS_WEB_DIR" ] && [ -f "$NEXUS_WEB_DIR/dist/server/index.js" ]; then
   echo -e "  -> Panel Nexus Web détecté, mise à jour en cours..."
@@ -73,4 +78,13 @@ fi
 
 echo -e "\n ${GR}[+] Mise à jour OTA terminée avec succès !${NC}"
 sleep 2
-menu
+if [ -x "$SCRIPT_DIR/menu.sh" ]; then
+    exec bash "$SCRIPT_DIR/menu.sh"
+elif [ -x "/usr/local/sbin/menu.sh" ]; then
+    exec bash "/usr/local/sbin/menu.sh"
+elif command -v menu >/dev/null 2>&1; then
+    exec menu
+else
+    echo -e "${RD}Erreur : menu introuvable. Lancez manuellement /usr/local/sbin/menu.sh${NC}"
+    exit 1
+fi
