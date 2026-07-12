@@ -316,6 +316,37 @@ function ntw_install() {
   echo -e "  Ce script va installer l'interface web Nexus Tunnel."
   echo -e "  Vous aurez besoin de définir un identifiant admin."
   echo ""
+  
+  # Pre-flight: Check Node.js version
+  echo -e "  ${YL}[CHECK]${NC} Vérification de Node.js..."
+  NODE_VERSION=$(node --version 2>/dev/null || echo "NONE")
+  NODE_MAJOR=$(echo "$NODE_VERSION" | tr -d 'v' | cut -d. -f1 || echo "0")
+  
+  if [ "$NODE_VERSION" = "NONE" ]; then
+    echo -e "  ${RD}[ERROR]${NC} Node.js n'est pas installé"
+    echo ""
+    echo -e "  Solution : exécuter ce script de correction"
+    echo -e "  ${GR}bash /root/node_upgrade_fix.sh${NC}"
+    echo ""
+    wait_key
+    nexus_web_menu
+    return
+  fi
+  
+  if [ "$NODE_MAJOR" -lt 20 ]; then
+    echo -e "  ${RD}[ERROR]${NC} Node $NODE_MAJOR détecté - requis >= 20"
+    echo ""
+    echo -e "  ${YL}[FIX]${NC} Télécharger le script de correction:"
+    echo -e "  ${GR}curl -o /root/node_upgrade_fix.sh https://raw.githubusercontent.com/abesskamer237/KATASHIE_VPN/main/node_upgrade_fix.sh${NC}"
+    echo -e "  ${GR}bash /root/node_upgrade_fix.sh${NC}"
+    echo ""
+    wait_key
+    nexus_web_menu
+    return
+  fi
+  
+  echo -e "  ${GR}[OK]${NC} Node $NODE_MAJOR ✓"
+  echo ""
 
   local installer
   if installer="$(resolve_web_installer)"; then
