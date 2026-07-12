@@ -47,20 +47,36 @@ echo -e "${NC}"
 
 # ─── PRE-FLIGHT: Force Node.js 20+ ──────────────────────────
 echo -e "${BLUE}[PRE-FLIGHT]${NC} Checking Node.js version..."
+ensure_node20() {
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -y >/dev/null 2>&1 || true
+    apt-get install -y ca-certificates curl gnupg lsb-release >/dev/null 2>&1 || true
+
+    mkdir -p /etc/apt/keyrings
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg >/dev/null 2>&1 || {
+        log_error "Impossible de récupérer la clé GPG NodeSource."
+    }
+
+    cat > /etc/apt/sources.list.d/nodesource.list <<'EOF'
+deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main
+EOF
+
+    apt-get update -y >/dev/null 2>&1 || true
+    apt-get install -y --allow-downgrades --allow-change-held-packages nodejs >/dev/null 2>&1 || {
+        log_error "Impossible d'installer Node.js 20 depuis NodeSource."
+    }
+}
+
 if ! command -v node >/dev/null 2>&1; then
     log_info "Installing Node.js 20 LTS..."
-    curl -fsSL https://deb.nodesource.com/setup_20.x 2>/dev/null | bash - || true
-    apt-get update -qq >/dev/null 2>&1 || true
-    apt-get install -y nodejs >/dev/null 2>&1 || true
+    ensure_node20
 fi
 
 NODE_MAJOR=$(node --version 2>/dev/null | tr -d 'v' | cut -d. -f1 || echo '0')
 if [ "$NODE_MAJOR" -lt 20 ]; then
     log_warn "Node.js $NODE_MAJOR detected. Forcing upgrade to Node.js 20 LTS..."
-    curl -fsSL https://deb.nodesource.com/setup_20.x 2>/dev/null | bash - || true
-    apt-get update -qq >/dev/null 2>&1 || true
-    apt-get install -y --only-upgrade nodejs >/dev/null 2>&1 || true
-    
+    ensure_node20
+
     NODE_NEW=$(node --version 2>/dev/null | tr -d 'v' | cut -d. -f1 || echo '0')
     if [ "$NODE_NEW" -lt 20 ]; then
         log_error "Node.js upgrade failed. Node $NODE_NEW still too old. Please upgrade Node.js manually to 20+."
