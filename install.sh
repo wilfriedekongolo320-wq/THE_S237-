@@ -8,7 +8,7 @@
 #     sudo bash install.sh
 #
 #   Requis: Node.js 20+, npm, PM2
-#   GitHub: https://github.com/abesskamer237/KATASHIE_VPN
+#   GitHub: https://github.com/wilfriedekongolo320-wq/THE_S237-
 # ============================================================
 
 set -euo pipefail
@@ -41,18 +41,18 @@ cat << 'BANNER'
  ██╔═██╗ ██╔══██║   ██║   ██╔══██║╚════██║██╔══██║██║██╔══╝
  ██║  ██╗██║  ██║   ██║   ██║  ██║███████║██║  ██║██║███████╗
  ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚══════╝
-                 Panneau Web — Installateur v2.0
+                  Panneau Web — Installateur v2.0
 BANNER
 echo -e "${NC}"
 
-# ─── PRE-FLIGHT: Force Node.js 20+ ──────────────────────────
+# ─── PRE-FLIGHT: Force Node.js 20+ ──────��───────────────────
 echo -e "${BLUE}[PRE-FLIGHT]${NC} Checking Node.js version..."
 ensure_node20() {
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -y >/dev/null 2>&1 || true
     apt-get install -y ca-certificates curl gnupg lsb-release >/dev/null 2>&1 || true
 
-    rm -f /etc/apt/sources.list.d/nodesource.list /etc/apt/sources.list.d/nodesource.list.save /etc/apt/sources.list.d/nodesource.list.distUpgrade /usr/share/keyrings/nodesource.gpg /etc/apt/keyrings/nodesource.gpg 2>/dev/null || true
+    rm -f /etc/apt/sources.list.d/nodesource.list /etc/apt/sources.list.d/nodesource.list.save /etc/apt/sources.list.d/nodesource.list.distUpgrade /usr/share/keyrings/nodesource.gpg /etc/apt/keyri[...]
     mkdir -p /usr/share/keyrings
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /usr/share/keyrings/nodesource.gpg >/dev/null 2>&1 || {
         log_error "Impossible de récupérer la clé GPG NodeSource."
@@ -158,7 +158,7 @@ NEXUS_PORT=${PANEL_PORT}
 # ─── Répertoire de la base de données ────────────────────────────
 KATASHIE_DB_DIR=${DB_DIR}
 
-# ─── Notifications Telegram (optionnel) ──────────────────────────
+# ─── Notifications Telegram (optionnel) ───────────────────��──────
 # Obtenez votre token via @BotFather sur Telegram
 # ⚠️  À CHANGER : remplacez par vos informations Telegram
 TELEGRAM_BOT_TOKEN=
@@ -262,5 +262,5 @@ echo -e "  1. Éditez ${BOLD}${ENV_FILE}${NC} et renseignez vos informations Cam
 echo -e "  2. Redémarrez : ${BOLD}pm2 restart $SERVICE_NAME${NC}"
 echo -e "  3. Ouvrez le port : ${BOLD}ufw allow ${PANEL_PORT_ACTUAL}/tcp${NC}"
 echo ""
-echo -e "${BLUE}  ► GitHub : https://github.com/abesskamer237/KATASHIE_VPN${NC}"
+echo -e "${BLUE}  ► GitHub : https://github.com/wilfriedekongolo320-wq/THE_S237-${NC}"
 echo ""
