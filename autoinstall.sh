@@ -2,14 +2,14 @@
 # ============================================================
 #   KATASHIE VPN — Auto-Installeur One-Line
 #   BUG FIX: SERVER_HOST pointait sur 'YOUR_GITHUB' placeholder.
-#   Maintenant corrigé vers le dépôt officiel KATASHIE VPN.
-#   GitHub: https://github.com/abesskamer237/KATASHIE_VPN
+#   Maintenant corrigé vers votre dépôt GitHub.
+#   GitHub: https://github.com/wilfriedekongolo320-wq/THE_S237-
 # ============================================================
 
 export DEBIAN_FRONTEND=noninteractive
 
 # ─── BUG FIX: Dépôt GitHub corrigé ──────────────────────────
-export SERVER_HOST="https://raw.githubusercontent.com/abesskamer237/KATASHIE_VPN/main"
+export SERVER_HOST="https://raw.githubusercontent.com/wilfriedekongolo320-wq/THE_S237-/main"
 export TIMEZONE="${TIMEZONE:-Africa/Douala}"
 
 RED='\033[0;31m'
@@ -49,7 +49,7 @@ BANNER
 echo -e "${NC}"
 echo -e "${WHITE}════════════════════════════════════════════════════${NC}"
 echo -e "${WHITE}   Commercial VPN Auto-Installer — KATASHIE VPN     ${NC}"
-echo -e "${WHITE}   GitHub: github.com/abesskamer237/KATASHIE_VPN    ${NC}"
+echo -e "${WHITE}   GitHub: github.com/wilfriedekongolo320-wq/THE_S237-    ${NC}"
 echo -e "${WHITE}════════════════════════════════════════════════════${NC}"
 echo ""
 
