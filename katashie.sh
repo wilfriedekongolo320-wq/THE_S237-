@@ -2,6 +2,7 @@
 # ============================================================
 #   KATASHIE VPN — Main Installer (katashie.sh)
 #   Remplace: nexus.sh
+#   Updated to point SERVER_HOST to user's repository
 # ============================================================
 
 # ─── Couleurs ────────────────────────────────────────────────
@@ -22,7 +23,7 @@ export GR="${GREEN}"
 export RD="${RED}"
 
 # ─── Configuration ────────────────────────────────────────────
-readonly SERVER_HOST="https://raw.githubusercontent.com/abesskamer237/KATASHIE_VPN/main"
+readonly SERVER_HOST="https://raw.githubusercontent.com/wilfriedekongolo320-wq/THE_S237-/main"
 readonly KATASHIE_VERSION="2.0.0"
 readonly TIMEZONE="Africa/Douala"
 export MYIP=$(wget -qO- ipv4.icanhazip.com 2>/dev/null || curl -s4 https://ipv4.icanhazip.com)
@@ -255,7 +256,7 @@ run_scripts() {
 install_menu() {
     log_step "Installation des scripts de menu..."
     mkdir -p "/usr/local/sbin"
-    local menus=(dns zivpn expiry domain iptools menu socks ssh status trojan vless vmess vmess_new vlesstls netguard openvpn shadowsocks hysteria2 speedtest tuic wireguard port log tgbot uninstall update web fastdns)
+    local menus=(dns zivpn expiry domain iptools menu socks ssh status trojan vless vmess vmess_new vlesstls netguard openvpn shadowsocks hysteria2 speedtest tuic wireguard port log tgbot uninsta[...]
     local failed=0
 
     for script in "${menus[@]}"; do
