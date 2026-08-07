@@ -1,6 +1,6 @@
 # KATASHIE VPN — Guide de Déploiement VPS
 
-> GitHub officiel : https://github.com/abesskamer237/KATASHIE_VPN
+> GitHub officiel : https://github.com/wilfriedekongolo320-wq/THE_S237-
 
 ---
 
@@ -23,7 +23,7 @@
 
 ```bash
 # Sur votre VPS (en root)
-wget -qO /tmp/autoinstall.sh https://raw.githubusercontent.com/abesskamer237/KATASHIE_VPN/main/autoinstall.sh
+wget -qO /tmp/autoinstall.sh https://raw.githubusercontent.com/wilfriedekongolo320-wq/THE_S237-/main/autoinstall.sh
 bash /tmp/autoinstall.sh
 ```
 
@@ -35,8 +35,8 @@ Cette commande télécharge et exécute automatiquement `katashie.sh` qui instal
 
 ```bash
 # 1. Télécharger l'archive
-git clone https://github.com/abesskamer237/KATASHIE_VPN.git
-cd KATASHIE_VPN
+git clone https://github.com/wilfriedekongolo320-wq/THE_S237-.git
+cd THE_S237-
 
 # 2. Lancer l'installateur
 sudo bash install.sh
@@ -56,8 +56,8 @@ Si tu veux un déploiement propre sur un VPS Ubuntu, utilise le script et le ser
 ```bash
 # 1. Cloner le dépôt
 sudo apt update && sudo apt install -y git curl
-git clone https://github.com/abesskamer237/KATASHIE_VPN.git
-cd KATASHIE_VPN
+git clone https://github.com/wilfriedekongolo320-wq/THE_S237-.git
+cd THE_S237-
 
 # 2. Installer le panneau web et le service systemd
 sudo bash install_web_panel_vps.sh
@@ -65,8 +65,8 @@ sudo bash install_web_panel_vps.sh
 
 Ce script va :
 - installer les dépendances Node.js du panneau,
-- compiler l’interface et le backend,
-- copier l’application dans /opt/katashie-web,
+- compiler l'interface et le backend,
+- copier l'application dans /opt/katashie-web,
 - créer le service systemd,
 - et démarrer automatiquement le panneau sur le port 2087.
 
@@ -83,7 +83,7 @@ Identifiants par défaut après démarrage :
 
 ---
 
-## � Méthode 4 — Déploiement local automatique du panneau web
+## 🚀 Méthode 4 — Déploiement local automatique du panneau web
 
 Un script de déploiement local est disponible dans la racine du dépôt :
 
@@ -94,7 +94,7 @@ sudo bash deploy_local_nexus_web.sh
 Ce script fait automatiquement :
 - vérifie et installe Node.js 20+,
 - installe les dépendances backend et frontend,
-- compile le serveur et l’interface React,
+- compile le serveur et l'interface React,
 - copie le projet dans `/opt/katashie-web`,
 - crée et démarre le service systemd `katashie-web`.
 
@@ -113,8 +113,8 @@ curl http://127.0.0.1:2087/health
 
 ```bash
 # 1. Cloner le dépôt
-git clone https://github.com/abesskamer237/KATASHIE_VPN.git
-cd KATASHIE_VPN
+git clone https://github.com/wilfriedekongolo320-wq/THE_S237-.git
+cd THE_S237-
 
 # 2. Configurer l'environnement
 cp .env.example .env
@@ -208,7 +208,7 @@ CAMPAY_REDIRECT_URL=https://VOTRE_DOMAINE.COM/payment/success
 {
   "bot_token": "VOTRE_TOKEN_TELEGRAM_BOT_DEPLOY",
   "admin_ids": [VOTRE_TELEGRAM_USER_ID],
-  "install_url": "https://raw.githubusercontent.com/abesskamer237/KATASHIE_VPN/main/autoinstall.sh",
+  "install_url": "https://raw.githubusercontent.com/wilfriedekongolo320-wq/THE_S237-/main/autoinstall.sh",
   "vps_presets": {
     "mon-vps-1": {
       "host": "IP_DE_VOTRE_VPS",
@@ -284,5 +284,6 @@ sqlite3 /etc/katashie-web/katashie.db "SELECT * FROM admins;"
 
 ## 🆘 Support
 
-- **Telegram** : @abess237
-- **GitHub Issues** : https://github.com/abesskamer237/KATASHIE_VPN/issues
+- **Telegram** : [@THE_S_NET](https://t.me/THE_S_NET)
+- **WhatsApp** : [+237 692 254 512](https://wa.me/237692254512)
+- **GitHub Issues** : https://github.com/wilfriedekongolo320-wq/THE_S237-/issues
