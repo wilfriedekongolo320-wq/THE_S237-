@@ -1,7 +1,7 @@
 # 🛡 KATASHIE VPN v2.0
 
 **Auto-installeur VPN multi-protocoles pour VPS Linux**  
-Contact: [@abess237](https://t.me/the_s_net) | [WhatsApp](https://wa.me/237692254512)  
+Contact: [@THE_S_NET](https://t.me/THE_S_NET) | [WhatsApp](https://wa.me/237692254512)  
 Chaîne: [WhatsApp Channel](https://whatsapp.com/channel/0029Vb8J9L44Y9li0Ffkqu1J)
 
 ---
@@ -122,8 +122,8 @@ cp katashie_whatsapp_bot/config.example.json /etc/katashie_whatsapp_bot/config.j
 
 ## 📞 Support
 
-- **Telegram:** [@abess237](https://t.me/the_s_net)
-- **WhatsApp:** [+237 682 229 367](https://wa.me/237692254512)
+- **Telegram:** [@THE_S_NET](https://t.me/THE_S_NET)
+- **WhatsApp:** [+237 692 254 512](https://wa.me/237692254512)
 - **Groupe WhatsApp:** [Rejoindre](https://chat.WhatsApp )
 - **Chaîne WhatsApp:** [S'abonner](https://whatsapp.com/channel)
 
