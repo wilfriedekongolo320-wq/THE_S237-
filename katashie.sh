@@ -56,7 +56,7 @@ show_banner() {
  ██║ ██╔╝██╔══██╗╚══██╔══╝██╔══██╗██╔════╝██║  ██║██║██╔════╝
  █████╔╝ ███████║   ██║   ███████║███████╗███████║██║█████╗
  ██╔═██╗ ██╔══██║   ██║   ██╔══██║╚════██║██╔══██║██║██╔══╝
- ██║  ██╗██║  ██║   ██║   ██║  ██║███████║██║  ██║██║███████╗
+ ██║  ██╗██║  ██║   ██║   ██║  ██║███████║██║  ██║██║███████║
  ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚══════╝
 BANNER
     echo -e "${NC}"
@@ -256,7 +256,8 @@ run_scripts() {
 install_menu() {
     log_step "Installation des scripts de menu..."
     mkdir -p "/usr/local/sbin"
-    local menus=(dns zivpn expiry domain iptools menu socks ssh status trojan vless vmess vmess_new vlesstls netguard openvpn shadowsocks hysteria2 speedtest tuic wireguard port log tgbot uninsta[...]
+    # CORRIGÉ : Tableau complètement défini et fermé correctement
+    local menus=(dns zivpn expiry domain iptools menu socks ssh status trojan vless vmess vmess_new vlesstls netguard openvpn shadowsocks hysteria2 speedtest tuic wireguard port log tgbot uninstall)
     local failed=0
 
     for script in "${menus[@]}"; do
