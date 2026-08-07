@@ -193,7 +193,7 @@ show_tns() {
 add_domain() {
     clear
     show_banner
-    echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
+    echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━���━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
     echo -e "${BLUE}┃${NC} ${BG_BLUE}                 CONFIGURATION DOMAINE          ${NC} ${BLUE}┃${NC}"
     echo -e "${BLUE}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
     echo -e "${BLUE}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
@@ -256,13 +256,13 @@ run_scripts() {
 install_menu() {
     log_step "Installation des scripts de menu..."
     mkdir -p "/usr/local/sbin"
-    # CORRIGÉ : Tableau complètement défini et fermé correctement
+    # TABLEAU CORRIGÉ ET COMPLÈTEMENT FERMÉ
     local menus=(dns zivpn expiry domain iptools menu socks ssh status trojan vless vmess vmess_new vlesstls netguard openvpn shadowsocks hysteria2 speedtest tuic wireguard port log tgbot uninstall)
     local failed=0
 
     for script in "${menus[@]}"; do
-        local url="${SERVER_HOST}/menu/${script}.sh"
-        local target="/usr/local/sbin/${script}.sh"
+        url="${SERVER_HOST}/menu/${script}.sh"
+        target="/usr/local/sbin/${script}.sh"
         if wget -q -O "$target" "$url"; then
             chmod +x "$target"
             ln -sf "$target" "/usr/local/sbin/${script}" 2>/dev/null || true
