@@ -2,7 +2,7 @@
 """
 KATASHIE VPN — Bot Telegram Principal v2
 Ajouts: boutons inline, notifications auto, gestion revendeurs via bot
-Contact: @abess237
+Contact: @THE_S_NET
 """
 import telebot
 from telebot import types
@@ -40,7 +40,7 @@ zivpn = ZivpnCore(cfg)
 sys_c = SystemCore(cfg)
 adm   = AdminCore(cfg)
 
-BANNER = "🛡 <b>KATASHIE VPN</b> — Panel Telegram\n📲 @abess237"
+BANNER = "🛡 <b>KATASHIE VPN</b> — Panel Telegram\n📲 @THE_S_NET"
 
 def is_admin(uid): return uid in ADMIN_IDS
 def is_reseller(uid): return uid in RESELLER_IDS or is_admin(uid)
@@ -105,13 +105,13 @@ def reseller_menu_keyboard():
     )
     return kb
 
-# ─── COMMANDS ─────────────────────────────────────────────────────────────────
+# ─── COMMANDS ──────────────────────────────────────────────────────────[...]
 @bot.message_handler(commands=['start', 'help'])
 def start(msg):
     adm_flag = is_admin(msg.from_user.id)
     res_flag = is_reseller(msg.from_user.id)
     if not adm_flag and not res_flag:
-        bot.reply_to(msg, "⛔ Vous n'avez pas accès à ce bot.\nContactez @abess237")
+        bot.reply_to(msg, "⛔ Vous n'avez pas accès à ce bot.\nContactez @THE_S_NET")
         return
     role = "Administrateur" if adm_flag else "Revendeur"
     bot.send_message(msg.chat.id,
@@ -182,7 +182,7 @@ def reseller_list_cmd(msg):
     result = adm.list_resellers()
     bot.reply_to(msg, result)
 
-# ─── INLINE CALLBACKS ─────────────────────────────────────────────────────────
+# ─── INLINE CALLBACKS ───────────────────────────────────────────────────────[...]
 @bot.callback_query_handler(func=lambda c: True)
 def callback_handler(call):
     uid = call.from_user.id

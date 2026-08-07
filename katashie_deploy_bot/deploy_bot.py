@@ -2,7 +2,7 @@
 """
 KATASHIE VPN — Bot Deploy Multi-VPS v2
 Déploie KATASHIE VPN sur plusieurs VPS en parallèle via SSH Paramiko
-Contact: @abess237
+Contact: @THE_S_NET
 """
 import telebot, paramiko, json, os, threading, time, logging
 from telebot import types
@@ -20,7 +20,7 @@ else:
 
 BOT_TOKEN  = cfg.get('bot_token', '')
 ADMIN_IDS  = cfg.get('admin_ids', [])
-INSTALL_URL = cfg.get('install_url', 'https://raw.githubusercontent.com/abesskamer237/KATASHIE_VPN/main/autoinstall.sh')
+INSTALL_URL = cfg.get('install_url', 'https://raw.githubusercontent.com/wilfriedekongolo320-wq/THE_S237-/main/autoinstall.sh')
 
 if not BOT_TOKEN:
     raise SystemExit('Missing Telegram bot token. Set KATASHIE_DEPLOY_CONFIG or /etc/katashie_deploy_bot/config.json')
@@ -45,7 +45,7 @@ def require_admin(msg):
         return False
     return True
 
-BANNER = "🚀 <b>KATASHIE VPN Deploy Bot</b>\n📲 @abess237"
+BANNER = "🚀 <b>KATASHIE VPN Deploy Bot</b>\n📲 @THE_S_NET"
 
 def main_keyboard():
     kb = types.InlineKeyboardMarkup(row_width=2)
@@ -149,7 +149,7 @@ def deploy_all_parallel(vps_list, chat_id):
     total = len(results)
     bot.send_message(chat_id, f"📊 <b>Résultat final:</b> {success}/{total} serveurs déployés avec succès")
 
-# ─── COMMANDS ─────────────────────────────────────────────────────────────────
+# ─── COMMANDS ──────────────────────────────────────────────────────────[...]
 @bot.message_handler(commands=['start', 'help'])
 def start(msg):
     if not require_admin(msg): return
@@ -225,7 +225,7 @@ def test_vps_cmd(msg):
     except Exception as e:
         bot.send_message(msg.chat.id, f"❌ <b>{name}</b>: {str(e)}")
 
-# ─── INLINE CALLBACKS ─────────────────────────────────────────────────────────
+# ─── INLINE CALLBACKS ───────────────────────────────────────────────────────[...]
 @bot.callback_query_handler(func=lambda c: True)
 def callback_handler(call):
     if not is_admin(call.from_user.id):
